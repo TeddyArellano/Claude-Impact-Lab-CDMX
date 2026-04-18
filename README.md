@@ -90,6 +90,60 @@ Portal de denuncias:
   - pasos-seguros-cdmx.csv (base de SAFE_CROSSINGS)
   - ubicacion_c5_c2.csv (base de C5_C2_LOCATIONS)
 
+### Detalle por fuente y como se usa
+
+| Fuente / archivo | Registros | Como se usa en la app |
+| --- | ---: | --- |
+| front/src/data/geojusticiaMock.js -> COMPLAINTS | 560 | Base de KPIs, filtros, ranking por tema, ranking por alcaldia y tendencia semanal. |
+| front/src/data/geojusticiaMock.js -> HEAT_POINTS | 320 | Capa de calor para visualizar concentracion espacial de incidencias. |
+| front/src/data/geojusticiaMock.js -> WIFI_POINTS | 260 | Capa de infraestructura digital como contexto territorial adicional. |
+| extra/data/pasos-seguros-cdmx.csv -> SAFE_CROSSINGS | 109 | Capa de cruces seguros para referencia de movilidad y seguridad vial. |
+| extra/data/ubicacion_c5_c2.csv -> C5_C2_LOCATIONS | 6 | Capa de centros C2/C5 para contexto de cobertura de monitoreo urbano. |
+| API Nominatim (OpenStreetMap) | variable (hasta 6 sugerencias por consulta en inicio y 1 resultado en mapa) | Busqueda de direcciones, geocodificacion y centrado de mapa por ubicacion consultada. |
+
+### Resumen general de volumen de datos (MapasPage)
+
+- COMPLAINTS: 560 registros de incidencias georreferenciadas.
+- HEAT_POINTS: 320 puntos para capa de calor.
+- WIFI_POINTS: 260 puntos de infraestructura digital.
+- SAFE_CROSSINGS: 109 cruces seguros (desde pasos-seguros-cdmx.csv).
+- C5_C2_LOCATIONS: 6 centros (5 C2 + 1 C5, desde ubicacion_c5_c2.csv).
+- Cobertura analitica base:
+  - 16 alcaldias
+  - 7 temas de incidencia
+  - 8 semanas para tendencia temporal
+
+### Insights operativos visibles en la vista de mapas
+
+Distribucion por estatus (sobre 560 incidencias):
+
+- Pendiente: 268 (47.9%)
+- Cerrado: 189 (33.8%)
+- Atendido: 103 (18.4%)
+- Carga activa (pendiente + atendido): 371 (66.3%)
+- Tasa de resolucion visible en KPI (cerrado / total): 33.8%
+
+Top 3 temas con mayor frecuencia:
+
+- ALUMBRADO: 121 (21.6%)
+- MANTENIMIENTO VIA PUBLICA: 109 (19.5%)
+- DESAZOLVE: 72 (12.9%)
+- Concentracion de los 3 temas principales: 302 incidencias (53.9% del total)
+
+Top 3 alcaldias con mayor numero de incidencias en el dataset base:
+
+- Milpa Alta: 46
+- Gustavo A. Madero: 42
+- Azcapotzalco: 41
+
+Como usa estos datos MapasPage:
+
+- KPI principal: total, pendientes, atendidos, cerrados y tasa de resolucion.
+- Ranking por tema: top de incidencias por categoria.
+- Ranking por alcaldia: concentracion territorial de reportes.
+- Tendencia semanal: serie de 8 semanas para el tema dominante filtrado.
+- Capas del mapa: puntos de quejas, calor, wifi, cruces seguros y centros C2/C5.
+
 ### Datos disponibles como referencia (no usados en runtime del frontend)
 
 - 07-2025-wifi_gratuito_en_postes-del-c5.xlsx
