@@ -1,3 +1,166 @@
+# GeoJusticia CDMX
+
+GeoJusticia es un sistema de gestion urbana ciudadana para la Ciudad de Mexico.
+No es solo una app de quejas: conecta a ciudadanos y alcaldias con contexto territorial, prioridad y seguimiento.
+
+## Idea central
+
+La CDMX recibe millones de quejas al ano y gran parte se pierde entre ruido, duplicados y falta de contexto.
+El problema tiene dos caras:
+
+- Ciudadano: no denuncia porque siente que su queja muere sola.
+- Alcaldia: no actua a tiempo porque recibe reportes desorganizados, sin prioridad ni inteligencia operativa.
+
+GeoJusticia alinea incentivos de ambos lados:
+
+- El ciudadano ve que no esta solo: su reporte forma parte de una denuncia colectiva.
+- La alcaldia recibe reportes semanales limpios y priorizados por zona y tipo de problema.
+- La plataforma convierte ruido en decisiones accionables.
+
+## Guion de producto (resumen de presentacion)
+
+Tres momentos para entender GeoJusticia:
+
+1. El ciudadano busca su colonia o direccion y ubica su zona en el mapa.
+2. Ve el mapa de calor de quejas activas y confirma que hay mas personas con el mismo problema.
+3. Cada semana, la alcaldia recibe un reporte automatizado y ordenado: donde actuar primero, con que prioridad y por que.
+
+Mensaje clave:
+
+- Esto no es un buzón digital de quejas.
+- Esto es infraestructura de gestion urbana ciudadana.
+
+## Estructura del proyecto (verificada)
+
+```text
+.
+├── README.md
+├── package.json
+├── package-lock.json
+├── back/
+│   ├── README.md
+│   ├── src/
+│   └── tests/
+├── front/
+│   ├── package.json
+│   ├── src/
+│   │   ├── components/
+│   │   ├── data/
+│   │   ├── pages/
+│   │   ├── App.jsx
+│   │   ├── index.css
+│   │   └── main.jsx
+│   └── ...
+└── extra/
+    ├── README.md
+    ├── data/
+    ├── documents/
+    ├── notebooks/
+    └── web/
+```
+
+## Modulos principales
+
+### Frontend (React + Vite)
+
+Rutas activas:
+
+- `/` Inicio con buscador y sugerencias de direccion.
+- `/mapas` Vista principal geoespacial (capas, filtros, ranking, toolbar, leyenda).
+- `/delegados_geojusticia` Portal de denuncias (adaptado a React).
+- `/denuncias` Alias de la ruta de denuncias.
+
+Flujo clave:
+
+1. Buscar direccion en Inicio.
+2. Navegar a Mapas con zoom contextual.
+3. Reportar desde CTA visible del mapa hacia el portal de denuncias.
+
+### Portal de denuncias
+
+- Seleccion de alcaldia con autocompletado.
+- Seleccion de categoria y urgencia.
+- Captura de datos minimos.
+- Generacion de folio.
+- Persistencia local de reportes en localStorage.
+
+## Datasets: que se usan hoy y que no
+
+Estado real en la app actual:
+
+### Usados en la experiencia actual
+
+- Geocodificacion y sugerencias de direccion:
+  - API de Nominatim (OpenStreetMap), para Home y Mapas.
+- Datos mock para simulacion operativa del mapa:
+  - `COMPLAINTS`, `HEAT_POINTS`, `WIFI_POINTS` en `front/src/data/geojusticiaMock.js`.
+- Datos reales integrados como arreglos dentro del frontend:
+  - `pasos-seguros-cdmx.csv` -> base de `SAFE_CROSSINGS`.
+  - `ubicacion_c5_c2.csv` -> base de `C5_C2_LOCATIONS`.
+
+### Disponibles como referencia (no consumidos por la app React hoy)
+
+- `07-2025-wifi_gratuito_en_postes-del-c5.xlsx`
+- `diccionario_coloniasiecm_2022.xlsx`
+- `diccionario_datos_ri_6.csv`
+- `equivalencias_parada_id.csv`
+- `MEX-INEGI.40.201.01-INV-2010.xml`
+- PDF de salud en `extra/documents/`
+
+Nota importante:
+
+- En esta version no se estan usando datasets de salud para render o logica del frontend.
+- Los archivos de salud se mantienen como insumo documental para iteraciones futuras.
+
+## Stack tecnico
+
+- Frontend: React 19, Vite, React Router.
+- Mapa: Leaflet, React Leaflet, leaflet.heat.
+- Estilo: CSS modular por pagina (sin framework CSS externo).
+- Persistencia local: localStorage (portal de denuncias).
+
+## Ejecucion local
+
+### Frontend
+
+```bash
+cd front
+npm install
+npm run dev
+```
+
+Build de produccion:
+
+```bash
+npm run build
+```
+
+Lint:
+
+```bash
+npm run lint
+```
+
+## Estado del proyecto
+
+Estado actual: MVP funcional de producto.
+
+Incluye:
+
+- Navegacion completa Inicio -> Mapas -> Denuncias.
+- UX orientada a denuncia colectiva y priorizacion territorial.
+- Reporte ciudadano con folio y historial local.
+
+Siguientes pasos recomendados:
+
+1. Sustituir datos mock por pipeline real desde `extra/data`.
+2. Generar reporte semanal automatico para alcaldias (PDF/CSV/API).
+3. Integrar backend para persistencia multiusuario y trazabilidad.
+4. Definir metricas operativas: tiempo de atencion, tasa de resolucion, zonas criticas.
+
+## Nombre oficial
+
+El nombre oficial del proyecto es: GeoJusticia.
 # 🗺️ Klaud: Índice de Injusticia Espacial en la Ciudad de México
 
 **Vectores de Dignidad: El derecho a la salud más allá de la puerta**
