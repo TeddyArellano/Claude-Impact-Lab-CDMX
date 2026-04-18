@@ -196,6 +196,14 @@ Incluye:
 - Visualizacion territorial para apoyo de priorizacion urbana.
 - Registro de denuncias con folio e historial local.
 
+## Contexto del evento
+
+Este proyecto fue desarrollado para el evento **Mexico City | Claude Impact Lab**.
+
+- Referencia oficial del evento: [Luma - Mexico City Claude Impact Lab](https://luma.com/claudemexicocitylab?tk=oELi62)
+- Enfoque elegido por el equipo: **Scorecard de Servicios**
+- Objetivo dentro del track: evaluar y visualizar la capacidad de respuesta de servicios urbanos a partir de reportes ciudadanos y analitica territorial.
+
 ## Nombre oficial
 
 Nombre oficial del proyecto: GeoJusticia.
