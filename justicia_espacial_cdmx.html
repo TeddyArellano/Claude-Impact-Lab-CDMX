@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>⚖️ Justicia Espacial CDMX — Índice de Injusticia en Salud Pública</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --bg: #0d0d1a;
+    --bg2: #13132a;
+    --bg3: #1a1a35;
+    --border: #2a2a4a;
+    --text: #e0e0f0;
+    --text-muted: #7878a8;
+    --accent: #7c3aed;
+    --accent2: #06b6d4;
+    --red: #ef4444;
+    --orange: #f97316;
+    --yellow: #eab308;
+    --green: #22c55e;
+    --purple: #a855f7;
+  }
+  body { background: var(--bg); color: var(--text); font-family: 'Segoe UI', system-ui, sans-serif; min-height: 100vh; }
+
+  /* HEADER */
+  header {
+    background: linear-gradient(135deg, #0d0d1a 0%, #1a0a3a 50%, #0a1a2e 100%);
+    border-bottom: 1px solid var(--border);
+    padding: 20px 32px;
+    display: flex; align-items: center; justify-content: space-between;
+    flex-wrap: wrap; gap: 12px;
+  }
+  .header-left h1 { font-size: 22px; font-weight: 800; letter-spacing: 0.5px; }
+  .header-left h1 span { color: var(--purple); }
+  .header-left p { font-size: 12px; color: var(--text-muted); margin-top: 3px; }
+  .header-right { display: flex; gap: 16px; flex-wrap: wrap; }
+  .stat-pill {
+    background: var(--bg3); border: 1px solid var(--border);
+    border-radius: 20px; padding: 6px 16px; text-align: center;
+    font-size: 11px; color: var(--text-muted);
+  }
+  .stat-pill b { display: block; font-size: 18px; color: var(--text); font-weight: 700; }
+
+  /* FORMULA BANNER */
+  .formula-bar {
+    background: linear-gradient(90deg, rgba(124,58,237,0.15), rgba(6,182,212,0.1));
+    border-bottom: 1px solid var(--border);
+    padding: 10px 32px;
+    font-size: 12px; color: var(--text-muted);
+    display: flex; align-items: center; gap: 16px; flex-wrap: wrap;
+  }
+  .formula-bar .formula { font-family: 'Courier New', monospace; color: var(--accent2); font-size: 13px; }
+
+  /* MAIN LAYOUT */
+  .main { display: grid; grid-template-columns: 1fr 380px; gap: 0; height: calc(100vh - 120px); }
+  
+  /* MAP PANEL */
+  .map-panel { position: relative; background: #000; overflow: hidden; }
+  #map-iframe { width: 100%; height: 100%; border: none; }
+  
+  /* SIDE PANEL */
+  .side-panel {
+    background: var(--bg2);
+    border-left: 1px solid var(--border);
+    overflow-y: auto;
+    padding: 0;
+    display: flex; flex-direction: column;
+  }
+  .side-panel::-webkit-scrollbar { width: 4px; }
+  .side-panel::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+
+  /* CARDS */
+  .panel-section { padding: 16px 18px; border-bottom: 1px solid var(--border); }
+  .panel-title {
+    font-size: 11px; font-weight: 700; letter-spacing: 1.5px;
+    color: var(--text-muted); text-transform: uppercase;
+    margin-bottom: 12px; display: flex; align-items: center; gap: 6px;
+  }
+  .panel-title::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+
+  /* RANKING TABLE */
+  .ranking-item {
+    display: flex; align-items: center; gap: 10px;
+    padding: 7px 10px; border-radius: 8px;
+    margin-bottom: 4px; cursor: pointer;
+    transition: background 0.15s; font-size: 11px;
+    border: 1px solid transparent;
+  }
+  .ranking-item:hover { background: var(--bg3); border-color: var(--border); }
+  .rank-num { font-size: 10px; color: var(--text-muted); min-width: 18px; text-align: right; }
+  .rank-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+  .rank-name { flex: 1; color: var(--text); line-height: 1.3; }
+  .rank-alcaldia { font-size: 10px; color: var(--text-muted); }
+  .rank-score {
+    font-size: 14px; font-weight: 700; min-width: 36px; text-align: right;
+  }
+
+  /* CHARTS */
+  .chart-wrap { position: relative; height: 200px; }
+  .chart-wrap-sm { position: relative; height: 160px; }
+
+  /* ALERT BADGE */
+  .alert-tag {
+    font-size: 9px; font-weight: 700; padding: 2px 7px; border-radius: 10px;
+    text-transform: uppercase; letter-spacing: 0.5px;
+  }
+  .tag-muy-alto { background: rgba(168,85,247,0.2); color: #a855f7; border: 1px solid rgba(168,85,247,0.4); }
+  .tag-alto { background: rgba(239,68,68,0.15); color: #ef4444; border: 1px solid rgba(239,68,68,0.3); }
+  .tag-medio { background: rgba(249,115,22,0.15); color: #f97316; border: 1px solid rgba(249,115,22,0.3); }
+  .tag-bajo { background: rgba(234,179,8,0.15); color: #eab308; border: 1px solid rgba(234,179,8,0.3); }
+  .tag-muy-bajo { background: rgba(34,197,94,0.1); color: #22c55e; border: 1px solid rgba(34,197,94,0.25); }
+
+  /* FOOTER */
+  footer {
+    background: var(--bg2); border-top: 1px solid var(--border);
+    padding: 8px 32px; font-size: 10px; color: var(--text-muted);
+    display: flex; gap: 24px; flex-wrap: wrap; align-items: center;
+  }
+  .src-tag { display: inline-flex; align-items: center; gap: 4px; }
+  .src-dot { width: 6px; height: 6px; border-radius: 50%; }
+
+  /* RESPONSIVE */
+  @media (max-width: 900px) {
+    .main { grid-template-columns: 1fr; grid-template-rows: 55vh auto; }
+    .side-panel { height: auto; max-height: 60vh; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-left">
+    <h1>⚖️ JUSTICIA ESPACIAL <span>CDMX</span> — ÍNDICE DE INJUSTICIA EN SALUD PÚBLICA</h1>
+    <p>Cuantificando el "impuesto de riesgo" que el ciudadano enfrenta para acceder a su unidad médica asignada · Datos 2024</p>
+  </div>
+  <div class="header-right">
+    <div class="stat-pill"><b>53</b>Unidades analizadas</div>
+    <div class="stat-pill"><b>6,192</b>Delitos transeúnte</div>
+    <div class="stat-pill"><b>13,714</b>Postes C5 WiFi</div>
+    <div class="stat-pill"><b>11,362</b>Paradas GTFS</div>
+    <div class="stat-pill"><b>1,814</b>Colonias</div>
+  </div>
+</header>
+
+<div class="formula-bar">
+  <span>📐 Índice de Injusticia:</span>
+  <span class="formula">I<sub>IN</sub> = [Delitos(500m) / ln(WiFi + Paradas + 1)] × [AlumScore / 5]</span>
+  <span>·</span>
+  <span>Normalizado [0–100] · 0 = acceso seguro · 100 = máxima injusticia</span>
+</div>
+
+<div class="main">
+  <!-- MAP -->
+  <div class="map-panel">
+    <iframe id="map-iframe" src="mapa_injusticia.html"></iframe>
+    <div style="position:absolute;bottom:8px;right:8px;background:rgba(0,0,0,0.7);padding:4px 8px;border-radius:4px;font-size:10px;color:#888;">
+      Haz clic en un marcador para ver detalles
+    </div>
+  </div>
+
+  <!-- SIDE PANEL -->
+  <div class="side-panel">
+
+    <!-- TOP 15 RANKING -->
+    <div class="panel-section">
+      <div class="panel-title">🚨 Ranking de Injusticia</div>
+      <div id="ranking-list"></div>
+    </div>
+
+    <!-- BAR CHART: Por alcaldía -->
+    <div class="panel-section">
+      <div class="panel-title">🏛️ Índice Promedio por Alcaldía</div>
+      <div class="chart-wrap">
+        <canvas id="chartAlcaldias"></canvas>
+      </div>
+    </div>
+
+    <!-- SCATTER: Delitos vs WiFi -->
+    <div class="panel-section">
+      <div class="panel-title">📊 Delitos vs Infraestructura WiFi</div>
+      <div class="chart-wrap-sm">
+        <canvas id="chartScatter"></canvas>
+      </div>
+      <p style="font-size:9px;color:var(--text-muted);margin-top:4px;">Cada punto = 1 unidad médica · Arriba-izquierda = mayor injusticia</p>
+    </div>
+
+    <!-- BREAKDOWN CARDS -->
+    <div class="panel-section">
+      <div class="panel-title">⚡ Hallazgos Clave</div>
+      <div id="insights"></div>
+    </div>
+
+    <!-- METHODOLOGY -->
+    <div class="panel-section" style="background:rgba(124,58,237,0.05);">
+      <div class="panel-title">📖 Metodología</div>
+      <div style="font-size:10px;color:var(--text-muted);line-height:1.7;">
+        <p><b style="color:var(--accent2)">Fuentes:</b></p>
+        <p>· FGJ CDMX 2024 — Carpetas de investigación (138k registros)</p>
+        <p>· C5 CDMX — Postes WiFi gratuito (13,714 puntos)</p>
+        <p>· GTFS CDMX — Paradas de transporte (11,362 stops)</p>
+        <p>· INEGI RI-6 — Score alumbrado por colonia (1,814 polígonos)</p>
+        <p style="margin-top:6px"><b style="color:var(--accent2)">Proceso:</b></p>
+        <p>· Reproyección UTM 14N (EPSG:32614) para cálculos en metros</p>
+        <p>· Buffer 500m: delitos + WiFi · Buffer 300m: paradas</p>
+        <p>· Normalización Min-Max → quintiles de riesgo</p>
+        <p style="margin-top:6px"><b style="color:var(--accent2)">Limitaciones:</b></p>
+        <p>· Coordenadas de unidades médicas estimadas desde PDF</p>
+        <p>· No incluye velocidad de caminata ni pendiente del terreno</p>
+        <p>· Delitos subreportados (cifra negra estimada ~85%)</p>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<footer>
+  <span>⚖️ Justicia Espacial CDMX MVP · 2024</span>
+  <span class="src-tag"><span class="src-dot" style="background:#ef4444"></span>FGJ Carpetas Investigación 2024</span>
+  <span class="src-tag"><span class="src-dot" style="background:#06b6d4"></span>C5 WiFi Postes</span>
+  <span class="src-tag"><span class="src-dot" style="background:#a855f7"></span>GTFS CDMX</span>
+  <span class="src-tag"><span class="src-dot" style="background:#22c55e"></span>INEGI RI-6 Infraestructura</span>
+  <span style="margin-left:auto">Procesado con DuckDB · GeoPandas · Folium</span>
+</footer>
+
+<script>
+const ALCALDIAS = [{"alcaldia":"Cuauhtémoc","indice_promedio":44.9,"max_indice":100.0,"total_delitos":108,"total_wifi":145,"unidades":4},{"alcaldia":"Tlalpan","indice_promedio":36.3,"max_indice":61.0,"total_delitos":13,"total_wifi":19,"unidades":3},{"alcaldia":"Xochimilco","indice_promedio":34.6,"max_indice":67.3,"total_delitos":23,"total_wifi":40,"unidades":3},{"alcaldia":"Coyoacán","indice_promedio":27.5,"max_indice":44.8,"total_delitos":26,"total_wifi":45,"unidades":3},{"alcaldia":"Miguel Hidalgo","indice_promedio":25.6,"max_indice":48.3,"total_delitos":35,"total_wifi":86,"unidades":4},{"alcaldia":"Iztacalco","indice_promedio":24.5,"max_indice":35.9,"total_delitos":37,"total_wifi":93,"unidades":3},{"alcaldia":"Benito Juárez","indice_promedio":22.6,"max_indice":26.3,"total_delitos":39,"total_wifi":74,"unidades":3},{"alcaldia":"Azcapotzalco","indice_promedio":20.0,"max_indice":26.7,"total_delitos":20,"total_wifi":43,"unidades":3},{"alcaldia":"Magdalena Contreras","indice_promedio":20.0,"max_indice":25.2,"total_delitos":8,"total_wifi":12,"unidades":2},{"alcaldia":"Gustavo A. Madero","indice_promedio":19.5,"max_indice":26.2,"total_delitos":35,"total_wifi":86,"unidades":5},{"alcaldia":"Iztapalapa","indice_promedio":17.4,"max_indice":20.4,"total_delitos":23,"total_wifi":63,"unidades":4},{"alcaldia":"Tláhuac","indice_promedio":15.3,"max_indice":33.0,"total_delitos":5,"total_wifi":11,"unidades":3},{"alcaldia":"Álvaro Obregón","indice_promedio":13.8,"max_indice":23.0,"total_delitos":13,"total_wifi":35,"unidades":4},{"alcaldia":"Cuajimalpa","indice_promedio":12.5,"max_indice":20.9,"total_delitos":7,"total_wifi":34,"unidades":3},{"alcaldia":"Venustiano Carranza","indice_promedio":9.1,"max_indice":11.5,"total_delitos":27,"total_wifi":113,"unidades":4},{"alcaldia":"Milpa Alta","indice_promedio":0.0,"max_indice":0.0,"total_delitos":0,"total_wifi":0,"unidades":2}];
+
+const TOP15 = [{"nombre":"HOSPITAL GENERAL GREGORIO SALAS","alcaldia":"Cuauhtémoc","lat":19.431,"lon":-99.141,"indice_injusticia":100.0,"n_delitos_500m":56,"n_wifi_500m":44,"n_stops_300m":11,"nivel_riesgo":"Muy Alto"},{"nombre":"HOSPITAL MATERNO INFANTIL XOCHIMILCO","alcaldia":"Xochimilco","lat":19.264,"lon":-99.103,"indice_injusticia":67.3,"n_delitos_500m":16,"n_wifi_500m":22,"n_stops_300m":13,"nivel_riesgo":"Muy Alto"},{"nombre":"CENTRO DE SALUD T-III DR. GERARDO VARELA MARISCAL","alcaldia":"Tlalpan","lat":19.251,"lon":-99.187,"indice_injusticia":61.0,"n_delitos_500m":2,"n_wifi_500m":0,"n_stops_300m":0,"nivel_riesgo":"Muy Alto"},{"nombre":"HOSPITAL PEDIÁTRICO TACUBAYA","alcaldia":"Miguel Hidalgo","lat":19.399,"lon":-99.197,"indice_injusticia":48.3,"n_delitos_500m":14,"n_wifi_500m":25,"n_stops_300m":3,"nivel_riesgo":"Muy Alto"},{"nombre":"CENTRO DE SALUD T-III DRA. MARGARITA CHORNE Y SALAZAR","alcaldia":"Coyoacán","lat":19.335,"lon":-99.151,"indice_injusticia":44.8,"n_delitos_500m":12,"n_wifi_500m":12,"n_stops_300m":3,"nivel_riesgo":"Muy Alto"},{"nombre":"CENTRO DE SALUD T-III XOCHIMILCO","alcaldia":"Xochimilco","lat":19.256,"lon":-99.101,"indice_injusticia":36.5,"n_delitos_500m":7,"n_wifi_500m":18,"n_stops_300m":4,"nivel_riesgo":"Muy Alto"},{"nombre":"CENTRO DE SALUD T-III DR. JOSÉ ZOZAYA","alcaldia":"Iztacalco","lat":19.394,"lon":-99.109,"indice_injusticia":35.9,"n_delitos_500m":18,"n_wifi_500m":37,"n_stops_300m":0,"nivel_riesgo":"Muy Alto"},{"nombre":"HOSPITAL PEDIÁTRICO COYOACÁN","alcaldia":"Coyoacán","lat":19.348,"lon":-99.162,"indice_injusticia":33.9,"n_delitos_500m":13,"n_wifi_500m":22,"n_stops_300m":0,"nivel_riesgo":"Muy Alto"},{"nombre":"HOSPITAL GENERAL RUBÉN LEÑERO","alcaldia":"Miguel Hidalgo","lat":19.449,"lon":-99.176,"indice_injusticia":33.1,"n_delitos_500m":12,"n_wifi_500m":33,"n_stops_300m":6,"nivel_riesgo":"Muy Alto"},{"nombre":"CENTRO DE SALUD T-III SAN FRANCISCO TLALTENCO","alcaldia":"Tláhuac","lat":19.301,"lon":-99.006,"indice_injusticia":33.0,"n_delitos_500m":2,"n_wifi_500m":1,"n_stops_300m":0,"nivel_riesgo":"Muy Alto"},{"nombre":"HOSPITAL PEDIÁTRICO PERALVILLO","alcaldia":"Cuauhtémoc","lat":19.45,"lon":-99.139,"indice_injusticia":30.6,"n_delitos_500m":16,"n_wifi_500m":37,"n_stops_300m":16,"nivel_riesgo":"Muy Alto"},{"nombre":"HOSPITAL MATERNO INFANTIL TOPILEJO","alcaldia":"Tlalpan","lat":19.234,"lon":-99.161,"indice_injusticia":27.3,"n_delitos_500m":4,"n_wifi_500m":6,"n_stops_300m":4,"nivel_riesgo":"Alto"},{"nombre":"HOSPITAL MATERNO INFANTIL DR. NICOLÁS M. CEDILLO","alcaldia":"Azcapotzalco","lat":19.483,"lon":-99.1785,"indice_injusticia":26.7,"n_delitos_500m":8,"n_wifi_500m":13,"n_stops_300m":0,"nivel_riesgo":"Alto"},{"nombre":"CENTRO DE SALUD T-III MIXCOAC","alcaldia":"Benito Juárez","lat":19.385,"lon":-99.189,"indice_injusticia":26.3,"n_delitos_500m":11,"n_wifi_500m":22,"n_stops_300m":17,"nivel_riesgo":"Alto"},{"nombre":"HOSPITAL MATERNO INFANTIL CUAUTEPEC","alcaldia":"Gustavo A. Madero","lat":19.546,"lon":-99.138,"indice_injusticia":26.2,"n_delitos_500m":6,"n_wifi_500m":13,"n_stops_300m":6,"nivel_riesgo":"Alto"}];
+
+// ---- COLOR HELPERS ----
+const COLORS = {
+  'Muy Alto': '#a855f7',
+  'Alto':     '#ef4444',
+  'Medio':    '#f97316',
+  'Bajo':     '#eab308',
+  'Muy Bajo': '#22c55e'
+};
+const TAG_CLASS = {
+  'Muy Alto': 'tag-muy-alto',
+  'Alto':     'tag-alto',
+  'Medio':    'tag-medio',
+  'Bajo':     'tag-bajo',
+  'Muy Bajo': 'tag-muy-bajo'
+};
+
+function scoreColor(v) {
+  if (v >= 80) return '#a855f7';
+  if (v >= 55) return '#ef4444';
+  if (v >= 35) return '#f97316';
+  if (v >= 15) return '#eab308';
+  return '#22c55e';
+}
+
+// ---- RANKING LIST ----
+const rankEl = document.getElementById('ranking-list');
+TOP15.forEach((h, i) => {
+  const c = COLORS[h.nivel_riesgo] || '#888';
+  const name = h.nombre.replace('CENTRO DE SALUD T-III ', 'CS ').replace('HOSPITAL ', 'H. ');
+  rankEl.innerHTML += `
+    <div class="ranking-item">
+      <span class="rank-num">${i+1}</span>
+      <span class="rank-dot" style="background:${c};box-shadow:0 0 5px ${c}55"></span>
+      <span class="rank-name">
+        ${name.slice(0,40)}${name.length>40?'…':''}
+        <br><span class="rank-alcaldia">${h.alcaldia} · 🔴${h.n_delitos_500m} 📡${h.n_wifi_500m} 🚌${h.n_stops_300m}</span>
+      </span>
+      <span class="rank-score" style="color:${c}">${h.indice_injusticia}</span>
+    </div>`;
+});
+
+// ---- CHART 1: Horizontal bar alcaldías ----
+const ctx1 = document.getElementById('chartAlcaldias').getContext('2d');
+new Chart(ctx1, {
+  type: 'bar',
+  data: {
+    labels: ALCALDIAS.map(a => a.alcaldia),
+    datasets: [{
+      label: 'Índice Promedio',
+      data: ALCALDIAS.map(a => a.indice_promedio),
+      backgroundColor: ALCALDIAS.map(a => scoreColor(a.indice_promedio) + 'bb'),
+      borderColor: ALCALDIAS.map(a => scoreColor(a.indice_promedio)),
+      borderWidth: 1,
+      borderRadius: 3,
+    }]
+  },
+  options: {
+    indexAxis: 'y',
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+      legend: { display: false },
+      tooltip: {
+        callbacks: {
+          label: (ctx) => {
+            const a = ALCALDIAS[ctx.dataIndex];
+            return [`Índice: ${a.indice_promedio}`, `Max: ${a.max_indice}`, `Delitos: ${a.total_delitos}`, `WiFi: ${a.total_wifi}`];
+          }
+        },
+        backgroundColor: '#1a1a35',
+        borderColor: '#2a2a4a',
+        borderWidth: 1,
+        titleColor: '#e0e0f0',
+        bodyColor: '#9090c0',
+      }
+    },
+    scales: {
+      x: {
+        grid: { color: '#1a1a35' },
+        ticks: { color: '#6060a0', font: { size: 9 } },
+        max: 55
+      },
+      y: {
+        grid: { display: false },
+        ticks: { color: '#9090c0', font: { size: 9 } }
+      }
+    }
+  }
+});
+
+// ---- CHART 2: Scatter delitos vs wifi ----
+const ctx2 = document.getElementById('chartScatter').getContext('2d');
+const scatterData = TOP15.concat(
+  [{"nombre":"HOSPITAL GENERAL LA VILLA","alcaldia":"Gustavo A. Madero","indice_injusticia":22.0,"n_delitos_500m":8,"n_wifi_500m":20,"nivel_riesgo":"Bajo"},
+   {"nombre":"HOSPITAL GENERAL BALBUENA","alcaldia":"Venustiano Carranza","indice_injusticia":11.5,"n_delitos_500m":10,"n_wifi_500m":45,"nivel_riesgo":"Muy Bajo"},
+   {"nombre":"HOSPITAL PEDIÁTRICO AZCAPOTZALCO","alcaldia":"Azcapotzalco","indice_injusticia":15.0,"n_delitos_500m":5,"n_wifi_500m":10,"nivel_riesgo":"Bajo"}]
+);
+new Chart(ctx2, {
+  type: 'scatter',
+  data: {
+    datasets: [{
+      label: 'Unidades médicas',
+      data: scatterData.map(h => ({ x: h.n_wifi_500m, y: h.n_delitos_500m, label: h.nombre })),
+      backgroundColor: scatterData.map(h => (COLORS[h.nivel_riesgo] || '#888') + 'aa'),
+      borderColor: scatterData.map(h => COLORS[h.nivel_riesgo] || '#888'),
+      borderWidth: 1,
+      pointRadius: 5,
+    }]
+  },
+  options: {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+      legend: { display: false },
+      tooltip: {
+        callbacks: {
+          label: (ctx) => {
+            const h = scatterData[ctx.dataIndex];
+            return [`${h.nombre.slice(0,30)}`, `Delitos: ${h.n_delitos_500m} · WiFi: ${h.n_wifi_500m}`];
+          }
+        },
+        backgroundColor: '#1a1a35',
+        borderColor: '#2a2a4a',
+        borderWidth: 1,
+        titleColor: '#e0e0f0',
+        bodyColor: '#9090c0',
+      }
+    },
+    scales: {
+      x: {
+        title: { display: true, text: 'Postes WiFi C5 (500m)', color: '#6060a0', font: { size: 9 } },
+        grid: { color: '#1a1a35' },
+        ticks: { color: '#6060a0', font: { size: 9 } }
+      },
+      y: {
+        title: { display: true, text: 'Delitos transeúnte (500m)', color: '#6060a0', font: { size: 9 } },
+        grid: { color: '#1a1a35' },
+        ticks: { color: '#6060a0', font: { size: 9 } }
+      }
+    }
+  }
+});
+
+// ---- INSIGHTS ----
+const insightsEl = document.getElementById('insights');
+const insights = [
+  { icon:'🏛️', color:'#a855f7', title:'Hospital Gregorio Salas (Cuauhtémoc)', text:'Índice máximo 100/100 — 56 delitos a transeúnte en 500m · Zona Centro histórico de alta densidad criminal.' },
+  { icon:'👶', color:'#ef4444', title:'3 Hospitales Pediátricos en riesgo Alto+', text:'Peralvillo, Tacubaya y Coyoacán — Familias con menores enfrentan el mayor índice de injusticia.' },
+  { icon:'🗺️', color:'#f97316', title:'Tlalpan periférico = trampa invisible', text:'Varela Mariscal: 0 WiFi + 0 paradas en 300m. Aislamiento de infraestructura, no de delitos.' },
+  { icon:'✅', color:'#22c55e', title:'Venustiano Carranza: la paradoja', text:'113 postes WiFi compensan 27 delitos. Infraestructura densa = menor índice de injusticia.' },
+];
+insights.forEach(ins => {
+  insightsEl.innerHTML += `
+    <div style="display:flex;gap:10px;padding:8px;border-radius:8px;border:1px solid var(--border);margin-bottom:6px;background:var(--bg)">
+      <span style="font-size:18px;flex-shrink:0;line-height:1">${ins.icon}</span>
+      <div>
+        <p style="font-size:11px;font-weight:700;color:${ins.color};margin-bottom:3px">${ins.title}</p>
+        <p style="font-size:10px;color:var(--text-muted);line-height:1.5">${ins.text}</p>
+      </div>
+    </div>`;
+});
+</script>
+</body>
+</html>
