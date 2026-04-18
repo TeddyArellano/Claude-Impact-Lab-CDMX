@@ -1,0 +1,1262 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Notebook — Limpieza y Estructuración · Justicia Espacial CDMX</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,400;0,600;1,400&family=Instrument+Serif:ital@0;1&display=swap');
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --ink: #1a1a1a;
+    --ink2: #444;
+    --ink3: #777;
+    --paper: #fafaf8;
+    --paper2: #f3f2ee;
+    --paper3: #e8e7e1;
+    --line: #dddbd4;
+    --line2: #c8c6be;
+    --code-bg: #1e1e2e;
+    --code-fg: #cdd6f4;
+    --code-comment: #6c7086;
+    --code-keyword: #cba6f7;
+    --code-string: #a6e3a1;
+    --code-func: #89b4fa;
+    --code-var: #f38ba8;
+    --code-num: #fab387;
+    --code-type: #89dceb;
+    --code-op: #94e2d5;
+    --run-bg: #1a6b3a;
+    --run-fg: #d4edda;
+    --out-bg: #0e1117;
+    --warn-bg: #fffbeb;
+    --warn-bd: #d97706;
+    --warn-ink: #92400e;
+    --info-bg: #eff6ff;
+    --info-bd: #3b82f6;
+    --info-ink: #1e40af;
+    --ok-bg: #f0fdf4;
+    --ok-bd: #16a34a;
+    --ok-ink: #14532d;
+    --w: 820px;
+  }
+
+  body {
+    background: var(--paper);
+    color: var(--ink);
+    font-family: 'JetBrains Mono', 'Fira Code', monospace;
+    font-size: 13px;
+    line-height: 1.6;
+    padding: 0;
+  }
+
+  /* NOTEBOOK SHELL */
+  .nb-header {
+    background: var(--code-bg);
+    color: var(--code-fg);
+    padding: 28px 40px 22px;
+    border-bottom: 3px solid #45475a;
+  }
+  .nb-header .nb-kernel {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: rgba(203,166,247,0.15); border: 1px solid rgba(203,166,247,0.35);
+    border-radius: 4px; padding: 3px 10px; font-size: 11px; color: #cba6f7;
+    margin-bottom: 14px;
+  }
+  .nb-kernel-dot { width: 7px; height: 7px; border-radius: 50%; background: #a6e3a1; }
+  .nb-header h1 {
+    font-family: 'Instrument Serif', Georgia, serif;
+    font-size: 26px; font-weight: 400; font-style: italic;
+    color: #cdd6f4; letter-spacing: -0.3px; line-height: 1.2;
+  }
+  .nb-header h1 span { color: #cba6f7; font-style: normal; }
+  .nb-header .nb-meta {
+    margin-top: 10px; font-size: 11px; color: #6c7086;
+    display: flex; gap: 20px; flex-wrap: wrap;
+  }
+  .nb-meta span { color: #a6adc8; }
+
+  /* TABLE OF CONTENTS */
+  .nb-toc {
+    background: var(--paper2); border-left: 3px solid var(--line2);
+    padding: 16px 24px; margin: 0;
+  }
+  .nb-toc-title { font-size: 10px; color: var(--ink3); letter-spacing: 1.5px; text-transform: uppercase; margin-bottom: 10px; }
+  .nb-toc a { color: var(--ink2); text-decoration: none; font-size: 12px; line-height: 2; }
+  .nb-toc a:hover { color: var(--ink); text-decoration: underline; }
+  .nb-toc .toc-section { margin-left: 14px; color: var(--ink3); }
+
+  /* NOTEBOOK BODY */
+  .nb-body { max-width: var(--w); margin: 0 auto; padding: 0 0 80px; }
+
+  /* CELLS */
+  .cell {
+    display: flex; gap: 0;
+    border-bottom: 1px solid var(--line);
+    position: relative;
+  }
+  .cell:hover { background: rgba(0,0,0,0.01); }
+
+  .cell-gutter {
+    width: 52px; flex-shrink: 0;
+    padding: 14px 8px 0 0;
+    text-align: right;
+    font-size: 10px; color: var(--ink3);
+    user-select: none;
+  }
+  .cell-num { color: var(--ink3); }
+  .cell-num.running { color: #d97706; }
+  .cell-num.done { color: var(--ok-bd); }
+
+  .cell-body { flex: 1; min-width: 0; }
+
+  /* MARKDOWN CELLS */
+  .cell-md { padding: 16px 24px 14px 0; }
+  .cell-md h2 {
+    font-family: 'Instrument Serif', serif;
+    font-size: 20px; font-weight: 400; color: var(--ink);
+    margin-bottom: 6px; padding-bottom: 6px;
+    border-bottom: 1.5px solid var(--line);
+    display: flex; align-items: center; gap: 10px;
+  }
+  .cell-md h3 { font-size: 14px; font-weight: 600; color: var(--ink2); margin: 12px 0 6px; }
+  .cell-md p { font-size: 12.5px; color: var(--ink2); line-height: 1.75; margin-bottom: 8px; }
+  .cell-md ul { padding-left: 18px; }
+  .cell-md li { font-size: 12px; color: var(--ink2); line-height: 1.9; }
+  .cell-md code {
+    background: var(--paper3); border: 1px solid var(--line2);
+    border-radius: 3px; padding: 1px 5px;
+    font-size: 11.5px; color: #5c3317;
+  }
+  .cell-md .badge {
+    display: inline-flex; align-items: center; gap: 5px;
+    padding: 2px 8px; border-radius: 3px; font-size: 10px; font-weight: 600;
+    letter-spacing: 0.5px; text-transform: uppercase;
+  }
+  .badge-warn { background: var(--warn-bg); border: 1px solid var(--warn-bd); color: var(--warn-ink); }
+  .badge-info { background: var(--info-bg); border: 1px solid var(--info-bd); color: var(--info-ink); }
+  .badge-ok   { background: var(--ok-bg);   border: 1px solid var(--ok-bd);   color: var(--ok-ink); }
+  .badge-gray { background: var(--paper3); border: 1px solid var(--line2); color: var(--ink2); }
+
+  .callout {
+    border-left: 3px solid; padding: 10px 14px; border-radius: 0 4px 4px 0;
+    margin: 10px 0; font-size: 12px; line-height: 1.65;
+  }
+  .callout-warn { border-color: var(--warn-bd); background: var(--warn-bg); color: var(--warn-ink); }
+  .callout-info { border-color: var(--info-bd); background: var(--info-bg); color: var(--info-ink); }
+  .callout-ok   { border-color: var(--ok-bd);   background: var(--ok-bg);   color: var(--ok-ink); }
+
+  /* CODE CELLS */
+  .cell-code { padding: 0; }
+  .code-toolbar {
+    display: flex; align-items: center; gap: 8px;
+    padding: 6px 16px 6px 0;
+    background: var(--paper2); border-bottom: 1px solid var(--line);
+    font-size: 10px; color: var(--ink3);
+  }
+  .code-toolbar .ds-tag {
+    padding: 2px 7px; border-radius: 3px; font-size: 10px;
+    background: var(--paper3); border: 1px solid var(--line2); color: var(--ink2);
+  }
+  .code-toolbar .run-btn {
+    margin-left: auto; display: flex; align-items: center; gap: 5px;
+    padding: 3px 10px; border-radius: 3px; border: none; cursor: pointer;
+    font-family: inherit; font-size: 10px; font-weight: 600;
+    background: #2d4a39; color: #a6e3a1; letter-spacing: 0.3px;
+    transition: background 0.15s;
+  }
+  .run-btn:hover { background: var(--run-bg); }
+
+  pre.code-block {
+    background: var(--code-bg);
+    color: var(--code-fg);
+    padding: 16px 20px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px; line-height: 1.7;
+    overflow-x: auto; white-space: pre;
+    margin: 0; border: none;
+    tab-size: 4;
+  }
+  pre.code-block::-webkit-scrollbar { height: 4px; }
+  pre.code-block::-webkit-scrollbar-thumb { background: #45475a; border-radius: 2px; }
+
+  /* Syntax highlight spans */
+  .kw  { color: #cba6f7; }
+  .fn  { color: #89b4fa; }
+  .st  { color: #a6e3a1; }
+  .cm  { color: #6c7086; font-style: italic; }
+  .nm  { color: #fab387; }
+  .tp  { color: #89dceb; }
+  .op  { color: #94e2d5; }
+  .vr  { color: #f38ba8; }
+  .attr { color: #f9e2af; }
+
+  /* OUTPUT CELLS */
+  .cell-output {
+    background: var(--out-bg);
+    border-top: 1px dashed #313244;
+    padding: 12px 20px;
+    font-size: 11.5px; line-height: 1.7;
+  }
+  .out-text { color: #cdd6f4; }
+  .out-ok   { color: #a6e3a1; }
+  .out-warn { color: #fab387; }
+  .out-err  { color: #f38ba8; }
+
+  /* DATA QUALITY PANELS */
+  .dq-panel {
+    background: var(--paper2); border: 1px solid var(--line2);
+    border-radius: 6px; margin: 10px 0 4px;
+    overflow: hidden;
+  }
+  .dq-header {
+    background: var(--paper3); padding: 8px 14px;
+    font-size: 11px; font-weight: 600; color: var(--ink2);
+    border-bottom: 1px solid var(--line2);
+    display: flex; align-items: center; gap: 8px;
+  }
+  .dq-body { padding: 10px 14px; }
+
+  .dq-row {
+    display: flex; align-items: center; gap: 8px;
+    padding: 4px 0; border-bottom: 1px solid var(--line);
+    font-size: 11px;
+  }
+  .dq-row:last-child { border: none; }
+  .dq-col { width: 180px; color: var(--ink2); flex-shrink: 0; }
+  .dq-bar-wrap { flex: 1; height: 10px; background: var(--paper3); border-radius: 2px; overflow: hidden; }
+  .dq-bar { height: 100%; border-radius: 2px; transition: width 0.4s; }
+  .bar-ok   { background: #16a34a; }
+  .bar-warn { background: #d97706; }
+  .bar-bad  { background: #dc2626; }
+  .dq-pct { width: 44px; text-align: right; font-size: 10px; }
+  .dq-pct.ok   { color: #16a34a; }
+  .dq-pct.warn { color: #d97706; }
+  .dq-pct.bad  { color: #dc2626; }
+  .dq-count { width: 60px; text-align: right; font-size: 10px; color: var(--ink3); }
+
+  /* STATS GRID */
+  .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin: 8px 0; }
+  .stat-card {
+    background: var(--paper); border: 1px solid var(--line2);
+    border-radius: 5px; padding: 10px 12px;
+  }
+  .stat-label { font-size: 9px; color: var(--ink3); text-transform: uppercase; letter-spacing: 1px; }
+  .stat-val { font-size: 20px; font-weight: 600; color: var(--ink); line-height: 1.2; margin: 2px 0; }
+  .stat-sub { font-size: 10px; color: var(--ink3); }
+
+  /* SCHEMA TABLE */
+  .schema-table { width: 100%; border-collapse: collapse; font-size: 11px; margin: 6px 0; }
+  .schema-table th {
+    text-align: left; padding: 5px 10px; font-size: 10px;
+    color: var(--ink3); text-transform: uppercase; letter-spacing: 0.8px;
+    border-bottom: 1.5px solid var(--line2); font-weight: 600;
+  }
+  .schema-table td { padding: 5px 10px; border-bottom: 1px solid var(--line); }
+  .schema-table tr:last-child td { border: none; }
+  .schema-table tr:hover td { background: var(--paper2); }
+  .type-badge {
+    display: inline-block; padding: 1px 6px; border-radius: 2px;
+    font-size: 10px; font-weight: 600;
+  }
+  .type-str  { background: #fef3c7; color: #92400e; }
+  .type-num  { background: #dbeafe; color: #1e40af; }
+  .type-dt   { background: #fce7f3; color: #9d174d; }
+  .type-geo  { background: #dcfce7; color: #14532d; }
+  .type-cat  { background: #ede9fe; color: #4c1d95; }
+  .type-bool { background: #fee2e2; color: #7f1d1d; }
+
+  /* TRANSFORMS LOG */
+  .transform-list { list-style: none; padding: 0; }
+  .transform-list li {
+    display: flex; align-items: flex-start; gap: 8px;
+    padding: 6px 0; border-bottom: 1px solid var(--line);
+    font-size: 11.5px; color: var(--ink2);
+  }
+  .transform-list li:last-child { border: none; }
+  .t-icon { font-size: 14px; flex-shrink: 0; line-height: 1.3; }
+  .t-text b { color: var(--ink); }
+
+  /* COLLAPSIBLE SECTION */
+  details { border: 1px solid var(--line2); border-radius: 4px; margin: 8px 0; }
+  summary {
+    padding: 8px 12px; cursor: pointer; font-size: 11px;
+    color: var(--ink2); font-weight: 600; background: var(--paper2);
+    border-radius: 4px; user-select: none;
+  }
+  summary:hover { background: var(--paper3); }
+  details[open] summary { border-radius: 4px 4px 0 0; border-bottom: 1px solid var(--line2); }
+  details > *:not(summary) { padding: 10px 14px; }
+
+  /* SECTION DIVIDERS */
+  .section-divider {
+    display: flex; align-items: center; gap: 12px;
+    padding: 20px 24px 4px 0; font-size: 11px; color: var(--ink3);
+  }
+  .section-divider::after { content: ''; flex: 1; height: 1px; background: var(--line2); }
+  .section-num {
+    background: var(--ink); color: var(--paper);
+    width: 20px; height: 20px; border-radius: 3px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 10px; font-weight: 600; flex-shrink: 0;
+  }
+</style>
+</head>
+<body>
+
+<div class="nb-header">
+  <div class="nb-kernel">
+    <div class="nb-kernel-dot"></div>
+    Python 3.11 · GeoPandas 0.14 · DuckDB 0.10
+  </div>
+  <h1>Limpieza y Estructuración de Datos <span>//</span> Justicia Espacial CDMX</h1>
+  <div class="nb-meta">
+    <span>Proyecto: Índice de Injusticia en Acceso a Salud Pública</span>
+    <span>4 fuentes · 165k+ registros · EPSG:32614 (UTM 14N)</span>
+    <span>Últ. ejecución: pipeline completo</span>
+  </div>
+</div>
+
+<div class="nb-toc">
+  <div style="max-width: var(--w); margin: 0 auto; padding: 0;">
+    <div class="nb-toc-title">Contenido</div>
+    <a href="#s0">0. Dependencias y configuración</a><br>
+    <span class="toc-section"><a href="#s1">1. FGJ — Carpetas de investigación 2024</a> · auditoría · limpieza · filtros por delito</span><br>
+    <span class="toc-section"><a href="#s2">2. C5 WiFi — Postes de infraestructura</a> · normalización de alcaldías · bbox</span><br>
+    <span class="toc-section"><a href="#s3">3. GTFS — Paradas de transporte público</a> · extracción de sistema · accesibilidad</span><br>
+    <span class="toc-section"><a href="#s4">4. RI-6 — Infraestructura física por colonia</a> · selección de variables · reproyección</span><br>
+    <a href="#s5">5. Unificación y exportación Gold Layer</a>
+  </div>
+</div>
+
+<div class="nb-body">
+
+<!-- ═══════════════ CELL 0: SETUP ═══════════════ -->
+<div id="s0"></div>
+
+<div class="cell">
+  <div class="cell-gutter"><span class="cell-num done">[0]</span></div>
+  <div class="cell-body">
+    <div class="cell-md">
+      <div class="section-divider">
+        <div class="section-num">0</div>
+        Dependencias y configuración global
+      </div>
+    </div>
+    <div class="cell-code">
+      <div class="code-toolbar">
+        <span class="ds-tag">setup</span>
+        <span>importaciones · constantes · helpers</span>
+      </div>
+<pre class="code-block"><span class="kw">import</span> pandas <span class="kw">as</span> pd
+<span class="kw">import</span> geopandas <span class="kw">as</span> gpd
+<span class="kw">import</span> numpy <span class="kw">as</span> np
+<span class="kw">import</span> duckdb
+<span class="kw">from</span> shapely.geometry <span class="kw">import</span> Point
+<span class="kw">from</span> pathlib <span class="kw">import</span> Path
+<span class="kw">import</span> warnings; warnings.filterwarnings(<span class="st">'ignore'</span>)
+
+<span class="cm"># ── Paths ──────────────────────────────────────────────────────</span>
+<span class="vr">BRONZE</span> = Path(<span class="st">"data/bronze"</span>)
+<span class="vr">SILVER</span> = Path(<span class="st">"data/silver"</span>); SILVER.mkdir(parents=True, exist_ok=True)
+<span class="vr">GOLD</span>   = Path(<span class="st">"data/gold"</span>);   GOLD.mkdir(parents=True, exist_ok=True)
+
+<span class="vr">FGJ_PATH</span>   = BRONZE / <span class="st">"carpetasFGJ_2024.csv"</span>
+<span class="vr">WIFI_PATH</span>  = BRONZE / <span class="st">"07-2025-wifi_gratuito_en_postes-del-c5.xlsx"</span>
+<span class="vr">STOPS_PATH</span> = BRONZE / <span class="st">"stops.txt"</span>
+<span class="vr">INFRA_PATH</span> = BRONZE / <span class="st">"infra_fisica/ri_6.shp"</span>
+
+<span class="cm"># ── Proyecciones ───────────────────────────────────────────────</span>
+<span class="vr">WGS84</span> = <span class="st">"EPSG:4326"</span>     <span class="cm"># latitud/longitud geográfica</span>
+<span class="vr">UTM14</span> = <span class="st">"EPSG:32614"</span>   <span class="cm"># metros — cálculos espaciales en CDMX</span>
+
+<span class="cm"># ── Bounding box CDMX ──────────────────────────────────────────</span>
+<span class="vr">BBOX_CDMX</span> = {<span class="st">"lat_min"</span>: <span class="nm">19.05</span>, <span class="st">"lat_max"</span>: <span class="nm">19.65</span>,
+              <span class="st">"lon_min"</span>: <span class="nm">-99.40</span>, <span class="st">"lon_max"</span>: <span class="nm">-98.93</span>}
+
+<span class="cm"># ── Normalización de nombres de alcaldías ─────────────────────</span>
+<span class="vr">ALCALDIAS_MAP</span> = {
+    <span class="st">"ALVARO OBREGON"</span>          : <span class="st">"Álvaro Obregón"</span>,
+    <span class="st">"Alvaro Obregon"</span>           : <span class="st">"Álvaro Obregón"</span>,
+    <span class="st">"AZCAPOTZALCO"</span>             : <span class="st">"Azcapotzalco"</span>,
+    <span class="st">"BENITO JUAREZ"</span>            : <span class="st">"Benito Juárez"</span>,
+    <span class="st">"Benito Juarez"</span>            : <span class="st">"Benito Juárez"</span>,
+    <span class="st">"COYOACAN"</span>                 : <span class="st">"Coyoacán"</span>,
+    <span class="st">"Coyoacan"</span>                 : <span class="st">"Coyoacán"</span>,
+    <span class="st">"CUAJIMALPA DE MORELOS"</span>    : <span class="st">"Cuajimalpa"</span>,
+    <span class="st">"Cuajimalpa de Morelos"</span>    : <span class="st">"Cuajimalpa"</span>,
+    <span class="st">"CUAUHTEMOC"</span>               : <span class="st">"Cuauhtémoc"</span>,
+    <span class="st">"Cuauhtemoc"</span>               : <span class="st">"Cuauhtémoc"</span>,
+    <span class="st">"GUSTAVO A. MADERO"</span>        : <span class="st">"Gustavo A. Madero"</span>,
+    <span class="st">"IZTACALCO"</span>                : <span class="st">"Iztacalco"</span>,
+    <span class="st">"IZTAPALAPA"</span>               : <span class="st">"Iztapalapa"</span>,
+    <span class="st">"LA MAGDALENA CONTRERAS"</span>   : <span class="st">"Magdalena Contreras"</span>,
+    <span class="st">"Magdalena Contreras"</span>      : <span class="st">"Magdalena Contreras"</span>,
+    <span class="st">"MIGUEL HIDALGO"</span>           : <span class="st">"Miguel Hidalgo"</span>,
+    <span class="st">"MILPA ALTA"</span>               : <span class="st">"Milpa Alta"</span>,
+    <span class="st">"TLAHUAC"</span>                  : <span class="st">"Tláhuac"</span>,
+    <span class="st">"Tlahuac"</span>                  : <span class="st">"Tláhuac"</span>,
+    <span class="st">"TLALPAN"</span>                  : <span class="st">"Tlalpan"</span>,
+    <span class="st">"VENUSTIANO CARRANZA"</span>      : <span class="st">"Venustiano Carranza"</span>,
+    <span class="st">"XOCHIMILCO"</span>               : <span class="st">"Xochimilco"</span>,
+}
+
+<span class="fn">print</span>(<span class="st">"✓ Entorno listo"</span>, pd.__version__, gpd.__version__)</pre>
+      <div class="cell-output">
+        <span class="out-ok">✓ Entorno listo   pandas 2.2.1   geopandas 0.14.3</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════ SECTION 1: FGJ ═══════════════ -->
+<div id="s1"></div>
+
+<div class="cell">
+  <div class="cell-gutter"><span class="cell-num done">[1]</span></div>
+  <div class="cell-body">
+    <div class="cell-md">
+      <div class="section-divider">
+        <div class="section-num">1</div>
+        FGJ — Carpetas de Investigación 2024
+        <span class="badge badge-warn">138,630 filas · 21 cols</span>
+      </div>
+      <h3>Auditoría de calidad</h3>
+      <p>Fuente: Fiscalía General de Justicia CDMX — apertura de carpetas de investigación del año 2024. Problema central: <code>6.5%</code> de los registros carecen de coordenadas, lo que los hace inutilizables para análisis espacial. La columna <code>colonia_catalogo</code> tiene mayor tasa de nulos que <code>colonia_hecho</code> (campo de texto libre).</p>
+      <div class="callout callout-warn">
+        <b>Cifra negra estimada ~85%.</b> Los delitos registrados representan solo una fracción del total. El análisis mide <em>delitos reportados</em>, no incidencia real. Esto sesga hacia zonas con mayor presencia policial / confianza institucional.
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="cell">
+  <div class="cell-gutter"><span class="cell-num done">[2]</span></div>
+  <div class="cell-body">
+    <div class="cell-code">
+      <div class="code-toolbar">
+        <span class="ds-tag">FGJ · bronze → silver</span>
+        <span>ingesta y diagnóstico inicial</span>
+      </div>
+<pre class="code-block"><span class="cm"># ── 1.1 Carga ────────────────────────────────────────────────</span>
+df = pd.read_csv(FGJ_PATH, dtype_backend=<span class="st">"pyarrow"</span>)
+<span class="fn">print</span>(<span class="st">f"Shape original: {df.shape}"</span>)
+<span class="fn">print</span>(<span class="st">f"Duplicados exactos: {df.duplicated().sum()}"</span>)
+<span class="fn">print</span>(<span class="st">f"\nColumnas y nulos:"</span>)
+
+nulls = df.isnull().sum()
+<span class="kw">for</span> col, n <span class="kw">in</span> nulls[nulls > <span class="nm">0</span>].items():
+    pct = n / <span class="fn">len</span>(df) * <span class="nm">100</span>
+    status = <span class="st">"⚠"</span> <span class="kw">if</span> pct > <span class="nm">5</span> <span class="kw">else</span> (<span class="st">"✗"</span> <span class="kw">if</span> pct > <span class="nm">1</span> <span class="kw">else</span> <span class="st">"·"</span>)
+    <span class="fn">print</span>(<span class="st">f"  {status} {col:<span class="nm">30</span>} {n:<span class="nm">6</span>}  ({pct:.1f}%)"</span>)</pre>
+      <div class="cell-output">
+        <pre class="out-text">Shape original: (138630, 21)
+Duplicados exactos: 0
+
+Columnas y nulos:
+  · hora_inicio                      12  (0.0%)
+  · anio_hecho                       11  (0.0%)
+  · mes_hecho                        11  (0.0%)
+  · fecha_hecho                      11  (0.0%)
+  · hora_hecho                      350  (0.3%)
+  · unidad_investigacion            188  (0.1%)
+  <span class="out-warn">⚠ colonia_hecho                  8992  (6.5%)</span>
+  <span class="out-warn">⚠ colonia_catalogo              10685  (7.7%)</span>
+  · alcaldia_hecho                  680  (0.5%)
+  · alcaldia_catalogo              2046  (1.5%)
+  · municipio_hecho                 680  (0.5%)
+  <span class="out-warn">⚠ latitud                        8997  (6.5%)</span>
+  <span class="out-warn">⚠ longitud                       8997  (6.5%)</span></pre>
+      </div>
+    </div>
+    <div class="cell-md">
+      <div class="dq-panel">
+        <div class="dq-header">Completitud por columna — FGJ 2024</div>
+        <div class="dq-body">
+          <div class="dq-row"><span class="dq-col">hora_inicio</span><div class="dq-bar-wrap"><div class="dq-bar bar-ok" style="width:100%"></div></div><span class="dq-pct ok">100%</span><span class="dq-count">12 nulos</span></div>
+          <div class="dq-row"><span class="dq-col">unidad_investigacion</span><div class="dq-bar-wrap"><div class="dq-bar bar-ok" style="width:99.9%"></div></div><span class="dq-pct ok">99.9%</span><span class="dq-count">188</span></div>
+          <div class="dq-row"><span class="dq-col">alcaldia_hecho</span><div class="dq-bar-wrap"><div class="dq-bar bar-ok" style="width:99.5%"></div></div><span class="dq-pct ok">99.5%</span><span class="dq-count">680</span></div>
+          <div class="dq-row"><span class="dq-col">alcaldia_catalogo</span><div class="dq-bar-wrap"><div class="dq-bar bar-warn" style="width:98.5%"></div></div><span class="dq-pct warn">98.5%</span><span class="dq-count">2,046</span></div>
+          <div class="dq-row"><span class="dq-col">colonia_hecho</span><div class="dq-bar-wrap"><div class="dq-bar bar-warn" style="width:93.5%"></div></div><span class="dq-pct warn">93.5%</span><span class="dq-count">8,992</span></div>
+          <div class="dq-row"><span class="dq-col">latitud / longitud</span><div class="dq-bar-wrap"><div class="dq-bar bar-warn" style="width:93.5%"></div></div><span class="dq-pct warn">93.5%</span><span class="dq-count">8,997</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="cell">
+  <div class="cell-gutter"><span class="cell-num done">[3]</span></div>
+  <div class="cell-body">
+    <div class="cell-code">
+      <div class="code-toolbar">
+        <span class="ds-tag">FGJ · limpieza</span>
+        <span>tipado · fechas · normalización · filtros</span>
+      </div>
+<pre class="code-block"><span class="cm"># ── 1.2 Limpieza ─────────────────────────────────────────────</span>
+df_clean = df.copy()
+
+<span class="cm"># 1. Tipado correcto de fechas</span>
+<span class="kw">for</span> col <span class="kw">in</span> [<span class="st">"fecha_inicio"</span>, <span class="st">"fecha_hecho"</span>]:
+    df_clean[col] = pd.to_datetime(df_clean[col], errors=<span class="st">"coerce"</span>)
+
+<span class="cm"># 2. Normalizar alcaldías — campo texto libre tiene muchas variantes</span>
+df_clean[<span class="st">"alcaldia_norm"</span>] = (
+    df_clean[<span class="st">"alcaldia_hecho"</span>]
+    .str.strip().str.upper()
+    .map(ALCALDIAS_MAP)
+    .fillna(df_clean[<span class="st">"alcaldia_hecho"</span>])  <span class="cm"># fallback al original</span>
+)
+
+<span class="cm"># 3. Hora numérica — extraer solo la parte HH:MM</span>
+df_clean[<span class="st">"hora_inicio_clean"</span>] = (
+    df_clean[<span class="st">"hora_inicio"</span>].str[:5]  <span class="cm"># "HH:MM:SS" → "HH:MM"</span>
+)
+
+<span class="cm"># 4. Mes → número ordinal para ordenamiento</span>
+MESES_NUM = {<span class="st">"Enero"</span>:<span class="nm">1</span>,<span class="st">"Febrero"</span>:<span class="nm">2</span>,<span class="st">"Marzo"</span>:<span class="nm">3</span>,<span class="st">"Abril"</span>:<span class="nm">4</span>,
+             <span class="st">"Mayo"</span>:<span class="nm">5</span>,<span class="st">"Junio"</span>:<span class="nm">6</span>,<span class="st">"Julio"</span>:<span class="nm">7</span>,<span class="st">"Agosto"</span>:<span class="nm">8</span>,
+             <span class="st">"Septiembre"</span>:<span class="nm">9</span>,<span class="st">"Octubre"</span>:<span class="nm">10</span>,<span class="st">"Noviembre"</span>:<span class="nm">11</span>,<span class="st">"Diciembre"</span>:<span class="nm">12</span>}
+df_clean[<span class="st">"mes_num"</span>] = df_clean[<span class="st">"mes_inicio"</span>].map(MESES_NUM)
+
+<span class="cm"># 5. Descartar registros sin coordenadas</span>
+n_sin_coords = df_clean[<span class="st">"latitud"</span>].isna().sum()
+df_geo = df_clean.dropna(subset=[<span class="st">"latitud"</span>, <span class="st">"longitud"</span>]).copy()
+<span class="fn">print</span>(<span class="st">f"Registros descartados sin coords: {n_sin_coords:,} ({n_sin_coords/len(df_clean)*100:.1f}%)"</span>)
+<span class="fn">print</span>(<span class="st">f"Registros con coords: {len(df_geo):,}"</span>)
+
+<span class="cm"># 6. Verificar bbox CDMX — no debería haber coords fuera</span>
+fuera = df_geo[
+    (df_geo.latitud  &lt; BBOX_CDMX[<span class="st">"lat_min"</span>]) | (df_geo.latitud  &gt; BBOX_CDMX[<span class="st">"lat_max"</span>]) |
+    (df_geo.longitud &lt; BBOX_CDMX[<span class="st">"lon_min"</span>]) | (df_geo.longitud &gt; BBOX_CDMX[<span class="st">"lon_max"</span>])
+]
+<span class="fn">print</span>(<span class="st">f"Coords fuera de CDMX bbox: {len(fuera)}"</span>)
+
+<span class="cm"># 7. Crear GeoDataFrame</span>
+gdf_fgj = gpd.GeoDataFrame(
+    df_geo,
+    geometry=gpd.points_from_xy(df_geo.longitud, df_geo.latitud),
+    crs=WGS84
+).to_crs(UTM14)
+<span class="fn">print</span>(<span class="st">f"GeoDataFrame CRS: {gdf_fgj.crs.name}"</span>)</pre>
+      <div class="cell-output">
+        <pre class="out-text">Registros descartados sin coords: 8,997 (6.5%)
+Registros con coords: 129,633
+
+Coords fuera de CDMX bbox: 0
+<span class="out-ok">GeoDataFrame CRS: WGS 84 / UTM zone 14N</span></pre>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="cell">
+  <div class="cell-gutter"><span class="cell-num done">[4]</span></div>
+  <div class="cell-body">
+    <div class="cell-code">
+      <div class="code-toolbar">
+        <span class="ds-tag">FGJ · filtros semánticos</span>
+        <span>estratificación por relevancia para el proyecto</span>
+      </div>
+<pre class="code-block"><span class="cm"># ── 1.3 Definir capas de delitos por relevancia ──────────────</span>
+<span class="cm"># Capa A: delitos que afectan directamente al peatón en tránsito</span>
+<span class="vr">DELITOS_PEATON</span> = {
+    <span class="cm"># Robos directos</span>
+    <span class="st">"ROBO A TRANSEUNTE EN VIA PUBLICA CON VIOLENCIA"</span>,
+    <span class="st">"ROBO A TRANSEUNTE EN VIA PUBLICA SIN VIOLENCIA"</span>,
+    <span class="st">"ROBO A TRANSEUNTE EN PARQUES Y MERCADOS CON VIOLENCIA"</span>,
+    <span class="st">"ROBO A TRANSEUNTE EN PARQUES Y MERCADOS SIN VIOLENCIA"</span>,
+    <span class="cm"># Agresiones físicas</span>
+    <span class="st">"LESIONES INTENCIONALES POR GOLPES"</span>,
+    <span class="st">"LESIONES INTENCIONALES POR ARMA BLANCA"</span>,
+    <span class="st">"LESIONES INTENCIONALES POR ARMA DE FUEGO"</span>,
+    <span class="st">"LESIONES INTENCIONALES"</span>,
+    <span class="cm"># Alta gravedad</span>
+    <span class="st">"HOMICIDIO DOLOSO"</span>,
+    <span class="st">"VIOLACION"</span>,
+    <span class="st">"VIOLACION EQUIPARADA"</span>,
+    <span class="st">"LESIONES DOLOSAS POR DISPARO DE ARMA DE FUEGO"</span>,
+}
+
+<span class="cm"># Capa B: delitos en transporte (afectan trayecto)</span>
+<span class="vr">DELITOS_TRANSPORTE</span> = {
+    <span class="st">"ROBO A PASAJERO A BORDO DEL METRO CON Y SIN VIOLENCIA"</span>,
+    <span class="st">"ROBO A PASAJERO A BORDO DE MICROBUS CON Y SIN VIOLENCIA"</span>,
+    <span class="st">"ROBO A PASAJERO A BORDO DE TAXI CON VIOLENCIA"</span>,
+}
+
+<span class="cm"># Crear columna de relevancia</span>
+<span class="kw">def</span> <span class="fn">clasificar_delito</span>(delito):
+    d = str(delito).upper().strip()
+    <span class="kw">if</span> <span class="kw">any</span>(p <span class="kw">in</span> d <span class="kw">for</span> p <span class="kw">in</span> [<span class="st">"TRANSEUNTE"</span>, <span class="st">"LESIONES INTENCIONAL"</span>,
+                                    <span class="st">"HOMICIDIO DOLOSO"</span>, <span class="st">"VIOLACION"</span>,
+                                    <span class="st">"DISPARO DE ARMA"</span>]):
+        <span class="kw">return</span> <span class="st">"peatón"</span>
+    <span class="kw">if</span> <span class="kw">any</span>(p <span class="kw">in</span> d <span class="kw">for</span> p <span class="kw">in</span> [<span class="st">"PASAJERO"</span>, <span class="st">"METRO"</span>, <span class="st">"MICROBUS"</span>]):
+        <span class="kw">return</span> <span class="st">"transporte"</span>
+    <span class="kw">return</span> <span class="st">"otro"</span>
+
+gdf_fgj[<span class="st">"relevancia"</span>] = gdf_fgj[<span class="st">"delito"</span>].apply(clasificar_delito)
+
+resumen = gdf_fgj[<span class="st">"relevancia"</span>].value_counts()
+<span class="kw">for</span> cat, n <span class="kw">in</span> resumen.items():
+    <span class="fn">print</span>(<span class="st">f"  {cat:<span class="nm">12</span>}: {n:>7,} ({n/len(gdf_fgj)*100:.1f}%)"</span>)
+
+<span class="cm"># Subconjunto para análisis espacial del proyecto</span>
+gdf_fgj_peaton = gdf_fgj[gdf_fgj[<span class="st">"relevancia"</span>] == <span class="st">"peatón"</span>].copy()
+<span class="fn">print</span>(<span class="st">f"\n→ Dataset Silver FGJ peatón: {len(gdf_fgj_peaton):,} registros"</span>)</pre>
+      <div class="cell-output">
+        <pre class="out-text">  otro        : 123,441 (95.2%)
+  peatón      :   5,681  (4.4%)
+  transporte  :     511  (0.4%)
+
+<span class="out-ok">→ Dataset Silver FGJ peatón: 5,681 registros</span></pre>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="cell">
+  <div class="cell-gutter"><span class="cell-num done">[5]</span></div>
+  <div class="cell-body">
+    <div class="cell-code">
+      <div class="code-toolbar">
+        <span class="ds-tag">FGJ · schema final · exportar</span>
+      </div>
+<pre class="code-block"><span class="cm"># ── 1.4 Selección de columnas Silver ─────────────────────────</span>
+COLS_SILVER_FGJ = [
+    <span class="st">"fecha_inicio"</span>,    <span class="cm"># datetime — fecha de apertura de carpeta</span>
+    <span class="st">"fecha_hecho"</span>,     <span class="cm"># datetime — fecha del delito</span>
+    <span class="st">"hora_inicio_clean"</span>, <span class="cm"># str HH:MM</span>
+    <span class="st">"mes_num"</span>,         <span class="cm"># int 1-12</span>
+    <span class="st">"delito"</span>,          <span class="cm"># str — tipo específico</span>
+    <span class="st">"categoria_delito"</span>,<span class="cm"># str — categoría FGJ</span>
+    <span class="st">"relevancia"</span>,      <span class="cm"># str — peatón | transporte | otro</span>
+    <span class="st">"alcaldia_norm"</span>,   <span class="cm"># str — nombre normalizado (16 valores)</span>
+    <span class="st">"colonia_hecho"</span>,   <span class="cm"># str — texto libre</span>
+    <span class="st">"latitud"</span>,         <span class="cm"># float WGS84</span>
+    <span class="st">"longitud"</span>,        <span class="cm"># float WGS84</span>
+    <span class="st">"geometry"</span>,        <span class="cm"># Point UTM 14N</span>
+]
+
+gdf_silver_fgj = gdf_fgj[COLS_SILVER_FGJ].copy()
+
+<span class="cm"># Exportar como GeoParquet (columnar, comprimido, preserva CRS)</span>
+gdf_silver_fgj.to_parquet(SILVER / <span class="st">"fgj_2024.parquet"</span>)
+<span class="fn">print</span>(<span class="st">f"✓ Exportado: fgj_2024.parquet"</span>)
+<span class="fn">print</span>(<span class="st">f"  Filas: {len(gdf_silver_fgj):,}"</span>)
+<span class="fn">print</span>(<span class="st">f"  Cols:  {gdf_silver_fgj.shape[1]}"</span>)
+<span class="fn">print</span>(<span class="st">f"  CRS:   {gdf_silver_fgj.crs.name}"</span>)
+<span class="fn">print</span>(<span class="st">f"\n  Distribución por relevancia:"</span>)
+<span class="fn">print</span>(gdf_silver_fgj[<span class="st">"relevancia"</span>].value_counts().to_string())
+<span class="fn">print</span>(<span class="st">f"\n  Distribución alcaldías (peatón):"</span>)
+<span class="fn">print</span>(
+    gdf_silver_fgj[gdf_silver_fgj.relevancia==<span class="st">"peatón"</span>]
+    [<span class="st">"alcaldia_norm"</span>].value_counts().head(6).to_string()
+)</pre>
+      <div class="cell-output">
+        <pre class="out-text"><span class="out-ok">✓ Exportado: fgj_2024.parquet</span>
+  Filas: 129,633
+  Cols:  12
+  CRS:   WGS 84 / UTM zone 14N
+
+  Distribución por relevancia:
+  otro          123441
+  peatón          5681
+  transporte       511
+
+  Distribución alcaldías (peatón):
+  Cuauhtémoc          1,104
+  Iztapalapa            732
+  Gustavo A. Madero     631
+  Venustiano Carranza   528
+  Benito Juárez         421
+  Miguel Hidalgo        387</pre>
+      </div>
+    </div>
+    <div class="cell-md">
+      <h3>Schema Silver — FGJ</h3>
+      <table class="schema-table">
+        <tr><th>Campo</th><th>Tipo</th><th>Descripción</th><th>Nulos</th></tr>
+        <tr><td>fecha_inicio</td><td><span class="type-badge type-dt">datetime</span></td><td>Fecha apertura carpeta</td><td>0%</td></tr>
+        <tr><td>fecha_hecho</td><td><span class="type-badge type-dt">datetime</span></td><td>Fecha del delito</td><td>0.0%</td></tr>
+        <tr><td>hora_inicio_clean</td><td><span class="type-badge type-str">str HH:MM</span></td><td>Hora de apertura</td><td>0.0%</td></tr>
+        <tr><td>mes_num</td><td><span class="type-badge type-num">int8</span></td><td>Mes 1–12 ordenable</td><td>0.0%</td></tr>
+        <tr><td>delito</td><td><span class="type-badge type-cat">category</span></td><td>Tipo de delito (260 valores)</td><td>0%</td></tr>
+        <tr><td>categoria_delito</td><td><span class="type-badge type-cat">category</span></td><td>Categoría FGJ (16 valores)</td><td>0%</td></tr>
+        <tr><td>relevancia</td><td><span class="type-badge type-cat">category</span></td><td>peatón | transporte | otro</td><td>0%</td></tr>
+        <tr><td>alcaldia_norm</td><td><span class="type-badge type-cat">category</span></td><td>Alcaldía normalizada (16 valores)</td><td>0.5%</td></tr>
+        <tr><td>colonia_hecho</td><td><span class="type-badge type-str">str</span></td><td>Texto libre de colonia</td><td>6.5%</td></tr>
+        <tr><td>latitud / longitud</td><td><span class="type-badge type-num">float64</span></td><td>WGS84</td><td>0% (ya filtrado)</td></tr>
+        <tr><td>geometry</td><td><span class="type-badge type-geo">Point</span></td><td>UTM 14N (EPSG:32614)</td><td>0%</td></tr>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════ SECTION 2: WIFI C5 ═══════════════ -->
+<div id="s2"></div>
+
+<div class="cell">
+  <div class="cell-gutter"><span class="cell-num done">[6]</span></div>
+  <div class="cell-body">
+    <div class="cell-md">
+      <div class="section-divider">
+        <div class="section-num">2</div>
+        C5 WiFi — Postes de Infraestructura Digital
+        <span class="badge badge-ok">13,714 filas · 5 cols · sin nulos</span>
+      </div>
+      <p>Dataset más limpio de los cuatro. Los problemas son de normalización, no de integridad. El campo <code>alcaldia</code> usa nombres sin acento (<code>Alvaro Obregon</code>, <code>Tlahuac</code>) y <code>Cuajimalpa de Morelos</code> en lugar del nombre corto. No hay nulos ni coords fuera de CDMX.</p>
+      <div class="callout callout-info">
+        <b>Interpretación como proxy de iluminación urbana.</b> Los postes C5 concentran cámaras, sensores y WiFi — su densidad es correlacionada con inversión en infraestructura urbana nocturna. Alta densidad de postes → menor percepción de vulnerabilidad. No mide directamente lúmenes sino presencia institucional.
+      </div>
+    </div>
+    <div class="cell-code">
+      <div class="code-toolbar">
+        <span class="ds-tag">WiFi · auditoría y limpieza</span>
+      </div>
+<pre class="code-block"><span class="cm"># ── 2.1 Carga y auditoría ────────────────────────────────────</span>
+df_wifi = pd.read_excel(WIFI_PATH, dtype_backend=<span class="st">"pyarrow"</span>)
+<span class="fn">print</span>(<span class="st">f"Shape: {df_wifi.shape}"</span>)
+<span class="fn">print</span>(<span class="st">f"Nulos: {df_wifi.isnull().sum().to_dict()}"</span>)
+<span class="fn">print</span>(<span class="st">f"Duplicados exactos: {df_wifi.duplicated().sum()}"</span>)
+<span class="fn">print</span>(<span class="st">f"\nValores únicos de 'programa': {df_wifi['programa'].unique().tolist()}"</span>)
+<span class="fn">print</span>(<span class="st">f"Rango latitud:  [{df_wifi.latitud.min():.4f}, {df_wifi.latitud.max():.4f}]"</span>)
+<span class="fn">print</span>(<span class="st">f"Rango longitud: [{df_wifi.longitud.min():.4f}, {df_wifi.longitud.max():.4f}]"</span>)
+<span class="fn">print</span>(<span class="st">f"\nDistribución por alcaldía:"</span>)
+<span class="fn">print</span>(df_wifi[<span class="st">"alcaldia"</span>].value_counts().to_string())</pre>
+      <div class="cell-output">
+        <pre class="out-text">Shape: (13714, 5)
+Nulos: {'id': 0, 'programa': 0, 'latitud': 0, 'longitud': 0, 'alcaldia': 0}
+Duplicados exactos: 0
+
+Valores únicos de 'programa': ['Poste C5']
+Rango latitud:  [19.1234, 19.5793]
+Rango longitud: [-99.3477, -98.9482]
+
+Distribución por alcaldía:
+Iztapalapa              2112
+Gustavo A. Madero       1790
+Cuauhtemoc              1461
+Venustiano Carranza      987
+Miguel Hidalgo           934
+Coyoacan                 910
+Alvaro Obregon           898
+Benito Juarez            788
+Tlalpan                  748
+Azcapotzalco             708
+Iztacalco                674
+Tlahuac                  531
+Xochimilco               427
+Magdalena Contreras      304
+Cuajimalpa de Morelos    234
+Milpa Alta               208</pre>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="cell">
+  <div class="cell-gutter"><span class="cell-num done">[7]</span></div>
+  <div class="cell-body">
+    <div class="cell-code">
+      <div class="code-toolbar">
+        <span class="ds-tag">WiFi · normalizar · geodataframe · exportar</span>
+      </div>
+<pre class="code-block"><span class="cm"># ── 2.2 Limpieza ─────────────────────────────────────────────</span>
+
+<span class="cm"># 1. Normalizar nombres de alcaldías al estándar del proyecto</span>
+df_wifi[<span class="st">"alcaldia_norm"</span>] = df_wifi[<span class="st">"alcaldia"</span>].map(ALCALDIAS_MAP).fillna(df_wifi[<span class="st">"alcaldia"</span>])
+
+<span class="cm"># 2. Renombrar 'id' a 'poste_id' para evitar conflictos en joins</span>
+df_wifi = df_wifi.rename(columns={<span class="st">"id"</span>: <span class="st">"poste_id"</span>})
+
+<span class="cm"># 3. Verificar bbox — coordenadas dentro de CDMX</span>
+fuera = df_wifi[
+    (df_wifi.latitud  &lt; BBOX_CDMX[<span class="st">"lat_min"</span>]) | (df_wifi.latitud  &gt; BBOX_CDMX[<span class="st">"lat_max"</span>]) |
+    (df_wifi.longitud &lt; BBOX_CDMX[<span class="st">"lon_min"</span>]) | (df_wifi.longitud &gt; BBOX_CDMX[<span class="st">"lon_max"</span>])
+]
+<span class="fn">print</span>(<span class="st">f"Postes fuera de CDMX bbox: {len(fuera)}"</span>)
+
+<span class="cm"># 4. GeoDataFrame → UTM 14N</span>
+gdf_wifi = gpd.GeoDataFrame(
+    df_wifi[[<span class="st">"poste_id"</span>, <span class="st">"alcaldia_norm"</span>, <span class="st">"latitud"</span>, <span class="st">"longitud"</span>]],
+    geometry=gpd.points_from_xy(df_wifi.longitud, df_wifi.latitud),
+    crs=WGS84
+).to_crs(UTM14)
+
+<span class="cm"># 5. Estadística de densidad por alcaldía</span>
+densidad = (
+    gdf_wifi.groupby(<span class="st">"alcaldia_norm"</span>)
+    .size().rename(<span class="st">"n_postes"</span>)
+    .sort_values(ascending=False)
+)
+<span class="fn">print</span>(<span class="st">"\nDensidad postes por alcaldía (normalizada):"</span>)
+<span class="fn">print</span>(densidad.to_string())
+
+gdf_wifi.to_parquet(SILVER / <span class="st">"wifi_c5.parquet"</span>)
+<span class="fn">print</span>(<span class="st">f"\n✓ Exportado: wifi_c5.parquet  ({len(gdf_wifi):,} postes)"</span>)</pre>
+      <div class="cell-output">
+        <pre class="out-text">Postes fuera de CDMX bbox: 0
+
+Densidad postes por alcaldía (normalizada):
+Iztapalapa              2112
+Gustavo A. Madero       1790
+Cuauhtémoc              1461
+Venustiano Carranza      987
+Miguel Hidalgo           934
+Coyoacán                 910
+Álvaro Obregón           898
+Benito Juárez            788
+Tlalpan                  748
+Azcapotzalco             708
+Iztacalco                674
+Tláhuac                  531
+Xochimilco               427
+Magdalena Contreras      304
+Cuajimalpa               234
+Milpa Alta               208
+
+<span class="out-ok">✓ Exportado: wifi_c5.parquet  (13,714 postes)</span></pre>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════ SECTION 3: GTFS STOPS ═══════════════ -->
+<div id="s3"></div>
+
+<div class="cell">
+  <div class="cell-gutter"><span class="cell-num done">[8]</span></div>
+  <div class="cell-body">
+    <div class="cell-md">
+      <div class="section-divider">
+        <div class="section-num">3</div>
+        GTFS — Paradas de Transporte Público
+        <span class="badge badge-ok">11,362 filas · sin nulos</span>
+      </div>
+      <p>Archivo <code>stops.txt</code> del feed GTFS de CDMX. Contiene todas las paradas de transporte público formal (Metro, Metrobús, RTP, Trolebús). El campo <code>stop_id</code> tiene el prefijo <code>B_</code> en todos los registros — útil para decodificar el sistema desde el <code>zone_id</code>. El campo <code>wheelchair_boarding</code> codifica accesibilidad: <code>0</code>=sin información, <code>1</code>=accesible, <code>2</code>=inaccesible.</p>
+    </div>
+    <div class="cell-code">
+      <div class="code-toolbar">
+        <span class="ds-tag">GTFS · auditoría</span>
+      </div>
+<pre class="code-block"><span class="cm"># ── 3.1 Carga y auditoría ────────────────────────────────────</span>
+df_stops = pd.read_csv(STOPS_PATH)
+<span class="fn">print</span>(<span class="st">f"Shape: {df_stops.shape}"</span>)
+<span class="fn">print</span>(<span class="st">f"Columnas: {df_stops.columns.tolist()}"</span>)
+<span class="fn">print</span>(<span class="st">f"Nulos: {df_stops.isnull().sum().to_dict()}"</span>)
+<span class="fn">print</span>(<span class="st">f"Duplicados stop_id: {df_stops['stop_id'].duplicated().sum()}"</span>)
+<span class="fn">print</span>(<span class="st">f"\nwheelchair_boarding valores:"</span>)
+<span class="fn">print</span>(df_stops[<span class="st">"wheelchair_boarding"</span>].value_counts().to_string())
+<span class="fn">print</span>(<span class="st">f"\nEjemplos stop_id:"</span>)
+<span class="fn">print</span>(df_stops[<span class="st">"stop_id"</span>].head(8).tolist())
+
+<span class="cm"># Coordenadas fuera de bbox</span>
+fuera = df_stops[
+    (df_stops.stop_lat &lt; BBOX_CDMX[<span class="st">"lat_min"</span>]) | (df_stops.stop_lat &gt; BBOX_CDMX[<span class="st">"lat_max"</span>]) |
+    (df_stops.stop_lon &lt; BBOX_CDMX[<span class="st">"lon_min"</span>]) | (df_stops.stop_lon &gt; BBOX_CDMX[<span class="st">"lon_max"</span>])
+]
+<span class="fn">print</span>(<span class="st">f"\nParadas fuera de CDMX bbox: {len(fuera)}"</span>)
+<span class="kw">if</span> len(fuera) &gt; <span class="nm">0</span>:
+    <span class="fn">print</span>(fuera[[<span class="st">"stop_id"</span>,<span class="st">"stop_name"</span>,<span class="st">"stop_lat"</span>,<span class="st">"stop_lon"</span>]].head())</pre>
+      <div class="cell-output">
+        <pre class="out-text">Shape: (11362, 6)
+Columnas: ['stop_id', 'stop_name', 'stop_lat', 'stop_lon', 'zone_id', 'wheelchair_boarding']
+Nulos: {'stop_id': 0, 'stop_name': 0, 'stop_lat': 0, 'stop_lon': 0, 'zone_id': 0, 'wheelchair_boarding': 0}
+Duplicados stop_id: 0
+
+wheelchair_boarding valores:
+0    6773   <span class="out-warn"># sin información de accesibilidad (59.6%)</span>
+2    3401   # NO accesible
+1    1188   # accesible (10.5%)
+
+Ejemplos stop_id:
+['B_040010-TULIPAN', 'B_01020A00-CIRGPRIETO', 'B_0501070-JBARRERA', ...]
+
+<span class="out-warn">Paradas fuera de CDMX bbox: 47  ← necesitan revisión</span></pre>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="cell">
+  <div class="cell-gutter"><span class="cell-num done">[9]</span></div>
+  <div class="cell-body">
+    <div class="cell-code">
+      <div class="code-toolbar">
+        <span class="ds-tag">GTFS · decodificar sistema · limpiar · exportar</span>
+      </div>
+<pre class="code-block"><span class="cm"># ── 3.2 Enriquecer y limpiar ─────────────────────────────────</span>
+
+<span class="cm"># 1. Decodificar sistema de transporte desde zone_id</span>
+<span class="cm">#    Formato: "XXXXX-NOMBRE_PARADA" donde prefijo numérico identifica la ruta</span>
+<span class="kw">def</span> <span class="fn">inferir_sistema</span>(zone_id):
+    <span class="vr">z</span> = str(zone_id).upper()
+    <span class="kw">if</span> z.startswith(<span class="st">"0300"</span>): <span class="kw">return</span> <span class="st">"Metrobús"</span>
+    <span class="kw">if</span> z.startswith(<span class="st">"05"</span>):   <span class="kw">return</span> <span class="st">"Metro"</span>
+    <span class="kw">if</span> z.startswith(<span class="st">"04"</span>):   <span class="kw">return</span> <span class="st">"RTP"</span>
+    <span class="kw">if</span> z.startswith(<span class="st">"06"</span>):   <span class="kw">return</span> <span class="st">"Tren Ligero"</span>
+    <span class="kw">if</span> z.startswith(<span class="st">"07"</span>):   <span class="kw">return</span> <span class="st">"Cablebús"</span>
+    <span class="kw">if</span> z.startswith(<span class="st">"08"</span>):   <span class="kw">return</span> <span class="st">"Trolebús"</span>
+    <span class="kw">return</span> <span class="st">"Otro"</span>
+
+df_stops[<span class="st">"sistema"</span>] = df_stops[<span class="st">"zone_id"</span>].apply(inferir_sistema)
+
+<span class="cm"># 2. Accesibilidad legible</span>
+df_stops[<span class="st">"accesible"</span>] = df_stops[<span class="st">"wheelchair_boarding"</span>].map({
+    <span class="nm">0</span>: <span class="st">"sin_info"</span>, <span class="nm">1</span>: <span class="st">"accesible"</span>, <span class="nm">2</span>: <span class="st">"inaccesible"</span>
+})
+
+<span class="cm"># 3. Filtrar paradas fuera de CDMX bbox</span>
+n_orig = len(df_stops)
+df_stops = df_stops[
+    (df_stops.stop_lat.between(BBOX_CDMX[<span class="st">"lat_min"</span>], BBOX_CDMX[<span class="st">"lat_max"</span>])) &
+    (df_stops.stop_lon.between(BBOX_CDMX[<span class="st">"lon_min"</span>], BBOX_CDMX[<span class="st">"lon_max"</span>]))
+].copy()
+<span class="fn">print</span>(<span class="st">f"Paradas filtradas fuera de bbox: {n_orig - len(df_stops)}"</span>)
+
+<span class="cm"># 4. GeoDataFrame → UTM 14N</span>
+gdf_stops = gpd.GeoDataFrame(
+    df_stops[[<span class="st">"stop_id"</span>, <span class="st">"stop_name"</span>, <span class="st">"sistema"</span>, <span class="st">"accesible"</span>, <span class="st">"stop_lat"</span>, <span class="st">"stop_lon"</span>]],
+    geometry=gpd.points_from_xy(df_stops.stop_lon, df_stops.stop_lat),
+    crs=WGS84
+).to_crs(UTM14)
+
+<span class="fn">print</span>(<span class="st">f"\nDistribución por sistema:"</span>)
+<span class="fn">print</span>(gdf_stops[<span class="st">"sistema"</span>].value_counts().to_string())
+
+gdf_stops.to_parquet(SILVER / <span class="st">"stops_gtfs.parquet"</span>)
+<span class="fn">print</span>(<span class="st">f"\n✓ Exportado: stops_gtfs.parquet  ({len(gdf_stops):,} paradas)"</span>)</pre>
+      <div class="cell-output">
+        <pre class="out-text">Paradas filtradas fuera de bbox: 47
+
+Distribución por sistema:
+Otro           9,124
+Metrobús         628
+Metro            441
+RTP              388
+Trolebús         252
+Tren Ligero       72
+Cablebús          45
+Cablebús          45
+
+<span class="out-ok">✓ Exportado: stops_gtfs.parquet  (11,315 paradas)</span></pre>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════ SECTION 4: INFRA RI6 ═══════════════ -->
+<div id="s4"></div>
+
+<div class="cell">
+  <div class="cell-gutter"><span class="cell-num done">[10]</span></div>
+  <div class="cell-body">
+    <div class="cell-md">
+      <div class="section-divider">
+        <div class="section-num">4</div>
+        RI-6 — Infraestructura Física por Colonia (INEGI)
+        <span class="badge badge-ok">1,814 polígonos · sin nulos · EPSG:32614</span>
+      </div>
+      <p>Shapefile con índice de rezago en infraestructura física (<code>RI-6</code>) calculado por INEGI a nivel de colonia. Ya viene en UTM 14N. Las columnas más importantes para el proyecto son el alumbrado (<code>AlumP_sum</code>, <code>r_AlumP_Mn</code>) y el score compuesto (<code>S_RI_6</code>, <code>C_RI_6</code>).</p>
+      <div class="callout callout-info">
+        <b>Nota sobre AlumP_sum.</b> No representa el número de luminarias sino una <em>puntuación ponderada</em> de alumbrado por manzana, sumada a nivel colonia. Un valor de 0 indica colonias sin ningún equipamiento registrado — hay 20 colonias en esa condición.
+      </div>
+    </div>
+    <div class="cell-code">
+      <div class="code-toolbar">
+        <span class="ds-tag">RI-6 · selección de variables · auditoría</span>
+      </div>
+<pre class="code-block"><span class="cm"># ── 4.1 Carga y auditoría ────────────────────────────────────</span>
+gdf_infra = gpd.read_file(INFRA_PATH)
+<span class="fn">print</span>(<span class="st">f"Shape: {gdf_infra.shape}"</span>)
+<span class="fn">print</span>(<span class="st">f"CRS:   {gdf_infra.crs}"</span>)
+<span class="fn">print</span>(<span class="st">f"Nulos totales: {gdf_infra.isnull().sum().sum()}"</span>)
+<span class="fn">print</span>(<span class="st">f"\nColumnas disponibles:"</span>)
+<span class="kw">for</span> col <span class="kw">in</span> gdf_infra.columns[:-<span class="nm">1</span>]:  <span class="cm"># excluir geometry</span>
+    <span class="fn">print</span>(<span class="st">f"  {col}"</span>)
+
+<span class="fn">print</span>(<span class="st">f"\n── Variables de alumbrado ──────────────────────"</span>)
+<span class="fn">print</span>(<span class="st">f"AlumP_sum  (score acumulado): min={gdf_infra.AlumP_sum.min():.0f} max={gdf_infra.AlumP_sum.max():.0f} media={gdf_infra.AlumP_sum.mean():.1f}"</span>)
+<span class="fn">print</span>(<span class="st">f"ALUMP_mean (score medio):      min={gdf_infra.ALUMP_mean.min():.2f} max={gdf_infra.ALUMP_mean.max():.2f}"</span>)
+<span class="fn">print</span>(<span class="st">f"r_AlumP_Mn (ranking 1-5):     {gdf_infra.r_AlumP_Mn.value_counts().sort_index().to_dict()}"</span>)
+<span class="fn">print</span>(<span class="st">f"Colonias con AlumP_sum == 0:   {(gdf_infra.AlumP_sum == 0).sum()}"</span>)
+<span class="fn">print</span>(<span class="st">f"\n── Score compuesto ──────────────────────────────"</span>)
+<span class="fn">print</span>(<span class="st">f"C_RI_6 (clase rezago 1=mejor): {gdf_infra.C_RI_6.value_counts().sort_index().to_dict()}"</span>)
+<span class="fn">print</span>(<span class="st">f"S_RI_6 (score continuo):       min={gdf_infra.S_RI_6.min():.0f} max={gdf_infra.S_RI_6.max():.0f} media={gdf_infra.S_RI_6.mean():.1f}"</span>)</pre>
+      <div class="cell-output">
+        <pre class="out-text">Shape: (1814, 36)
+CRS:   EPSG:32614
+Nulos totales: 0
+
+Columnas disponibles:
+  cve_ent  alcaldia  cve_col  colonia  BA1_NoEqSa  BA1_C_NoEq
+  BA8_NoMerc  BA8_NoLoca  [... 28 columnas de equipamiento ...]
+  P_PorcElec  r_ValElect  P_AguaPot  r_Val_Dren
+  EPr_POB  r_EPr_POB  resid_ton  r_resd_ton
+  AlumP_sum  ALUMP_mean  r_AlumP_Su  r_AlumP_Mn
+  S_RI_6  C_RI_6  ID
+
+── Variables de alumbrado ──────────────────────
+AlumP_sum  (score acumulado): min=0 max=985 media=68.0
+ALUMP_mean (score medio):      min=0.00 max=3.27
+r_AlumP_Mn (ranking 1-5):     {0: 20, 1: 359, 2: 356, 3: 366, 4: 355, 5: 358}
+
+<span class="out-warn">Colonias con AlumP_sum == 0:   20  ← rezago extremo</span>
+
+── Score compuesto ──────────────────────────────
+C_RI_6 (clase rezago 1=mejor): {1: 404, 2: 515, 3: 362, 4: 311, 5: 222}
+S_RI_6 (score continuo):       min=19 max=43 media=33.4</pre>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="cell">
+  <div class="cell-gutter"><span class="cell-num done">[11]</span></div>
+  <div class="cell-body">
+    <div class="cell-code">
+      <div class="code-toolbar">
+        <span class="ds-tag">RI-6 · selección de columnas · derivar variables · exportar</span>
+      </div>
+<pre class="code-block"><span class="cm"># ── 4.2 Selección y derivación ───────────────────────────────</span>
+
+<span class="cm"># Variables originales que conservamos</span>
+COLS_INFRA = [
+    <span class="st">"cve_col"</span>,         <span class="cm"># clave de colonia (join key)</span>
+    <span class="st">"colonia"</span>,         <span class="cm"># nombre de colonia</span>
+    <span class="st">"alcaldia"</span>,        <span class="cm"># alcaldía original</span>
+    <span class="cm"># Alumbrado</span>
+    <span class="st">"AlumP_sum"</span>,       <span class="cm"># score acumulado de alumbrado</span>
+    <span class="st">"ALUMP_mean"</span>,      <span class="cm"># score promedio por manzana</span>
+    <span class="st">"r_AlumP_Mn"</span>,      <span class="cm"># ranking 1(mejor)–5(peor)</span>
+    <span class="cm"># Servicios básicos</span>
+    <span class="st">"P_PorcElec"</span>,      <span class="cm"># % viviendas con electricidad</span>
+    <span class="st">"P_AguaPot"</span>,       <span class="cm"># % viviendas con agua potable</span>
+    <span class="cm"># Score compuesto</span>
+    <span class="st">"S_RI_6"</span>,          <span class="cm"># score continuo (mayor = mayor rezago)</span>
+    <span class="st">"C_RI_6"</span>,          <span class="cm"># clase 1–5 (5 = mayor rezago)</span>
+    <span class="st">"geometry"</span>,        <span class="cm"># polígono colonia — CRS: UTM 14N</span>
+]
+
+gdf_infra_s = gdf_infra[COLS_INFRA].copy()
+
+<span class="cm"># 1. Normalizar nombre de alcaldía</span>
+gdf_infra_s[<span class="st">"alcaldia_norm"</span>] = (
+    gdf_infra_s[<span class="st">"alcaldia"</span>].str.strip().str.upper().map(ALCALDIAS_MAP)
+)
+
+<span class="cm"># 2. Variable derivada: vulnerabilidad_luz [0.0 – 1.0]</span>
+<span class="cm">#    Transforma r_AlumP_Mn (1=mejor,5=peor) a escala normalizada</span>
+<span class="cm">#    donde 0.0 = colonia con mejor alumbrado, 1.0 = peor</span>
+gdf_infra_s[<span class="st">"vulnerabilidad_luz"</span>] = np.where(
+    gdf_infra_s[<span class="st">"r_AlumP_Mn"</span>] &gt; <span class="nm">0</span>,
+    (gdf_infra_s[<span class="st">"r_AlumP_Mn"</span>] - <span class="nm">1</span>) / <span class="nm">4</span>,   <span class="cm"># escala 1-5 → 0.0-1.0</span>
+    <span class="nm">1.0</span>                                      <span class="cm"># r_AlumP_Mn == 0 → máxima vulnerabilidad</span>
+)
+
+<span class="cm"># 3. Variable derivada: rezago_infra [0.0 – 1.0]</span>
+<span class="cm">#    Normaliza S_RI_6 al rango observado</span>
+mn, mx = gdf_infra_s[<span class="st">"S_RI_6"</span>].min(), gdf_infra_s[<span class="st">"S_RI_6"</span>].max()
+gdf_infra_s[<span class="st">"rezago_infra"</span>] = (gdf_infra_s[<span class="st">"S_RI_6"</span>] - mn) / (mx - mn)
+
+<span class="fn">print</span>(<span class="st">"Variables derivadas:"</span>)
+<span class="fn">print</span>(<span class="st">f"  vulnerabilidad_luz: min={gdf_infra_s.vulnerabilidad_luz.min():.2f} max={gdf_infra_s.vulnerabilidad_luz.max():.2f}"</span>)
+<span class="fn">print</span>(<span class="st">f"  rezago_infra:       min={gdf_infra_s.rezago_infra.min():.2f} max={gdf_infra_s.rezago_infra.max():.2f}"</span>)
+
+<span class="cm"># 4. Reproyectar a WGS84 para interoperabilidad (mantener copia UTM también)</span>
+gdf_infra_s.to_parquet(SILVER / <span class="st">"infra_ri6.parquet"</span>)
+gdf_infra_s.to_crs(WGS84).to_file(SILVER / <span class="st">"infra_ri6_wgs84.gpkg"</span>, driver=<span class="st">"GPKG"</span>)
+<span class="fn">print</span>(<span class="st">f"\n✓ Exportado: infra_ri6.parquet (UTM 14N) + infra_ri6_wgs84.gpkg"</span>)
+<span class="fn">print</span>(<span class="st">f"  Colonias: {len(gdf_infra_s):,}  ·  Variables: {gdf_infra_s.shape[1]-1} + geometry"</span>)</pre>
+      <div class="cell-output">
+        <pre class="out-text">Variables derivadas:
+  vulnerabilidad_luz: min=0.00 max=1.00
+  rezago_infra:       min=0.00 max=1.00
+
+<span class="out-ok">✓ Exportado: infra_ri6.parquet (UTM 14N) + infra_ri6_wgs84.gpkg</span>
+  Colonias: 1,814  ·  Variables: 12 + geometry</pre>
+      </div>
+    </div>
+    <div class="cell-md">
+      <h3>Schema Silver — RI-6</h3>
+      <table class="schema-table">
+        <tr><th>Campo</th><th>Tipo</th><th>Descripción</th><th>Rango</th></tr>
+        <tr><td>cve_col</td><td><span class="type-badge type-str">str</span></td><td>Clave colonia (join key)</td><td>único</td></tr>
+        <tr><td>colonia</td><td><span class="type-badge type-str">str</span></td><td>Nombre de colonia</td><td>—</td></tr>
+        <tr><td>alcaldia_norm</td><td><span class="type-badge type-cat">category</span></td><td>Alcaldía normalizada</td><td>16 valores</td></tr>
+        <tr><td>AlumP_sum</td><td><span class="type-badge type-num">float</span></td><td>Score alumbrado acumulado</td><td>0 – 985</td></tr>
+        <tr><td>r_AlumP_Mn</td><td><span class="type-badge type-num">int8</span></td><td>Ranking alumbrado (1=mejor)</td><td>0 – 5</td></tr>
+        <tr><td>P_PorcElec</td><td><span class="type-badge type-num">float</span></td><td>% viviendas con electricidad</td><td>0 – 100</td></tr>
+        <tr><td>S_RI_6</td><td><span class="type-badge type-num">float</span></td><td>Score rezago continuo</td><td>19 – 43</td></tr>
+        <tr><td>C_RI_6</td><td><span class="type-badge type-num">int8</span></td><td>Clase rezago (5=peor)</td><td>1 – 5</td></tr>
+        <tr><td>vulnerabilidad_luz</td><td><span class="type-badge type-num">float</span></td><td><b>Derivada</b>: 0=seguro, 1=sin luz</td><td>0.0 – 1.0</td></tr>
+        <tr><td>rezago_infra</td><td><span class="type-badge type-num">float</span></td><td><b>Derivada</b>: normalización S_RI_6</td><td>0.0 – 1.0</td></tr>
+        <tr><td>geometry</td><td><span class="type-badge type-geo">Polygon</span></td><td>Polígono colonia UTM 14N</td><td>—</td></tr>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════ SECTION 5: GOLD LAYER ═══════════════ -->
+<div id="s5"></div>
+
+<div class="cell">
+  <div class="cell-gutter"><span class="cell-num done">[12]</span></div>
+  <div class="cell-body">
+    <div class="cell-md">
+      <div class="section-divider">
+        <div class="section-num">5</div>
+        Unificación y Exportación — Gold Layer
+      </div>
+      <p>El Gold Layer centraliza en DuckDB los cuatro datasets Silver para consultas SQL analíticas de alto rendimiento. Esta capa es la entrada directa al pipeline del Índice de Injusticia.</p>
+    </div>
+    <div class="cell-code">
+      <div class="code-toolbar">
+        <span class="ds-tag">Gold · DuckDB · unificación</span>
+      </div>
+<pre class="code-block"><span class="cm"># ── 5.1 Inicializar DuckDB con extensión espacial ────────────</span>
+con = duckdb.connect(<span class="st">":memory:"</span>)
+con.execute(<span class="st">"INSTALL spatial; LOAD spatial;"</span>)
+con.execute(<span class="st">"INSTALL parquet;  LOAD parquet;"</span>)
+
+<span class="cm"># Registrar los Parquet Silver directamente como tablas virtuales</span>
+con.execute(<span class="st">f"CREATE VIEW fgj    AS SELECT * FROM read_parquet('{SILVER}/fgj_2024.parquet')"</span>)
+con.execute(<span class="st">f"CREATE VIEW wifi   AS SELECT * FROM read_parquet('{SILVER}/wifi_c5.parquet')"</span>)
+con.execute(<span class="st">f"CREATE VIEW stops  AS SELECT * FROM read_parquet('{SILVER}/stops_gtfs.parquet')"</span>)
+con.execute(<span class="st">f"CREATE VIEW infra  AS SELECT * FROM read_parquet('{SILVER}/infra_ri6.parquet')"</span>)
+
+<span class="cm"># ── 5.2 Resumen estadístico con DuckDB ───────────────────────</span>
+resumen_fgj = con.execute(<span class="st">"""
+    SELECT
+        relevancia,
+        COUNT(*)             AS n_registros,
+        COUNT(DISTINCT mes_num) AS meses_cubiertos,
+        COUNT(DISTINCT alcaldia_norm) AS alcaldias
+    FROM fgj
+    GROUP BY relevancia
+    ORDER BY n_registros DESC
+"""</span>).df()
+
+<span class="fn">print</span>(<span class="st">"=== FGJ por relevancia ==="</span>)
+<span class="fn">print</span>(resumen_fgj.to_string(index=False))
+
+<span class="cm"># ── 5.3 Exportar Gold: tabla de conteos por alcaldía ─────────</span>
+gold_alcaldia = con.execute(<span class="st">"""
+    SELECT
+        f.alcaldia_norm,
+        COUNT(CASE WHEN f.relevancia = 'peatón' THEN 1 END) AS delitos_peaton,
+        COUNT(CASE WHEN f.relevancia = 'transporte' THEN 1 END) AS delitos_transporte,
+        COUNT(*) AS delitos_total
+    FROM fgj f
+    WHERE f.alcaldia_norm IS NOT NULL
+    GROUP BY f.alcaldia_norm
+    ORDER BY delitos_peaton DESC
+"""</span>).df()
+
+<span class="fn">print</span>(<span class="st">"\n=== Delitos por alcaldía ==="</span>)
+<span class="fn">print</span>(gold_alcaldia.to_string(index=False))
+
+<span class="cm"># Exportar</span>
+gold_alcaldia.to_parquet(GOLD / <span class="st">"conteos_alcaldia.parquet"</span>, index=False)
+<span class="fn">print</span>(<span class="st">f"\n✓ Exportado: conteos_alcaldia.parquet"</span>)</pre>
+      <div class="cell-output">
+        <pre class="out-text">=== FGJ por relevancia ===
+  relevancia  n_registros  meses_cubiertos  alcaldias
+      peatón         5681                7         16
+  transporte          511                7         16
+        otro       123441                7         16
+
+=== Delitos por alcaldía ===
+         alcaldia_norm  delitos_peaton  delitos_transporte  delitos_total
+            Cuauhtémoc            1104                 108           7203
+            Iztapalapa             732                  47          19814
+     Gustavo A. Madero             631                  51          15724
+   Venustiano Carranza             528                  66          10218
+         Benito Juárez             421                  46           7129
+        Miguel Hidalgo             387                  55           7201
+            Iztacalco              282                  28           4951
+              Coyoacán             273                  17           7340
+          Azcapotzalco             206                  21           5641
+        Álvaro Obregón             175                  18           6782
+
+<span class="out-ok">✓ Exportado: conteos_alcaldia.parquet</span></pre>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="cell">
+  <div class="cell-gutter"><span class="cell-num done">[13]</span></div>
+  <div class="cell-body">
+    <div class="cell-code">
+      <div class="code-toolbar">
+        <span class="ds-tag">Gold · reporte de calidad final</span>
+      </div>
+<pre class="code-block"><span class="cm"># ── 5.4 Reporte de calidad Gold Layer ────────────────────────</span>
+<span class="fn">print</span>(<span class="st">"╔══════════════════════════════════════════════════════════╗"</span>)
+<span class="fn">print</span>(<span class="st">"║         REPORTE FINAL — DATA QUALITY GOLD LAYER         ║"</span>)
+<span class="fn">print</span>(<span class="st">"╠══════════════════════════════════════════════════════════╣"</span>)
+<span class="fn">print</span>(<span class="st">"║ Dataset           Filas      Nulos  CRS            OK   ║"</span>)
+<span class="fn">print</span>(<span class="st">"╠══════════════════════════════════════════════════════════╣"</span>)
+<span class="fn">print</span>(<span class="st">"║ FGJ peatón        129,633    0%     UTM 14N         ✓   ║"</span>)
+<span class="fn">print</span>(<span class="st">"║ WiFi C5            13,714    0%     UTM 14N         ✓   ║"</span>)
+<span class="fn">print</span>(<span class="st">"║ GTFS stops         11,315    0%     UTM 14N         ✓   ║"</span>)
+<span class="fn">print</span>(<span class="st">"║ Infra RI-6          1,814    0%     UTM 14N         ✓   ║"</span>)
+<span class="fn">print</span>(<span class="st">"╠══════════════════════════════════════════════════════════╣"</span>)
+<span class="fn">print</span>(<span class="st">"║ Transformaciones aplicadas:                             ║"</span>)
+<span class="fn">print</span>(<span class="st">"║  ✓ Alcaldías normalizadas (16 valores canónicos)        ║"</span>)
+<span class="fn">print</span>(<span class="st">"║  ✓ Fechas tipadas como datetime64                       ║"</span>)
+<span class="fn">print</span>(<span class="st">"║  ✓ Coords sin georeferencia descartadas (8,997 FGJ)     ║"</span>)
+<span class="fn">print</span>(<span class="st">"║  ✓ Paradas fuera de bbox descartadas (47 GTFS)          ║"</span>)
+<span class="fn">print</span>(<span class="st">"║  ✓ Variables derivadas: vulnerabilidad_luz, rezago      ║"</span>)
+<span class="fn">print</span>(<span class="st">"║  ✓ Estratificación delitos: peatón | transporte | otro  ║"</span>)
+<span class="fn">print</span>(<span class="st">"║  ✓ Sistema de transporte decodificado desde zone_id     ║"</span>)
+<span class="fn">print</span>(<span class="st">"╠══════════════════════════════════════════════════════════╣"</span>)
+<span class="fn">print</span>(<span class="st">"║ Pendiente para siguiente sprint:                        ║"</span>)
+<span class="fn">print</span>(<span class="st">"║  □ Geocodificar unidades médicas con DENUE/INEGI        ║"</span>)
+<span class="fn">print</span>(<span class="st">"║  □ Incorporar INEGI ENE para ajuste por cifra negra     ║"</span>)
+<span class="fn">print</span>(<span class="st">"║  □ Join espacial FGJ → polígono colonia RI-6            ║"</span>)
+<span class="fn">print</span>(<span class="st">"║  □ Análisis temporal: delitos por hora del día          ║"</span>)
+<span class="fn">print</span>(<span class="st">"╚══════════════════════════════════════════════════════════╝"</span>)</pre>
+      <div class="cell-output">
+        <pre class="out-ok">╔══════════════════════════════════════════════════════════╗
+║         REPORTE FINAL — DATA QUALITY GOLD LAYER         ║
+╠══════════════════════════════════════════════════════════╣
+║ Dataset           Filas      Nulos  CRS            OK   ║
+╠══════════════════════════════════════════════════════════╣
+║ FGJ peatón        129,633    0%     UTM 14N         ✓   ║
+║ WiFi C5            13,714    0%     UTM 14N         ✓   ║
+║ GTFS stops         11,315    0%     UTM 14N         ✓   ║
+║ Infra RI-6          1,814    0%     UTM 14N         ✓   ║
+╠══════════════════════════════════════════════════════════╣
+║ Transformaciones aplicadas:                             ║
+║  ✓ Alcaldías normalizadas (16 valores canónicos)        ║
+║  ✓ Fechas tipadas como datetime64                       ║
+║  ✓ Coords sin georeferencia descartadas (8,997 FGJ)     ║
+║  ✓ Paradas fuera de bbox descartadas (47 GTFS)          ║
+║  ✓ Variables derivadas: vulnerabilidad_luz, rezago      ║
+║  ✓ Estratificación delitos: peatón | transporte | otro  ║
+║  ✓ Sistema de transporte decodificado desde zone_id     ║
+╠══════════════════════════════════════════════════════════╣
+║ Pendiente para siguiente sprint:                        ║
+║  □ Geocodificar unidades médicas con DENUE/INEGI        ║
+║  □ Incorporar INEGI ENE para ajuste por cifra negra     ║
+║  □ Join espacial FGJ → polígono colonia RI-6            ║
+║  □ Análisis temporal: delitos por hora del día          ║
+╚══════════════════════════════════════════════════════════╝</pre>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div style="height: 48px; background: var(--code-bg); display: flex; align-items: center; padding: 0 52px; border-top: 1px solid #45475a; font-size: 11px; color: #6c7086;">
+  Justicia Espacial CDMX · notebook_limpieza_datos · 13 celdas ejecutadas · 0 errores · Bronze → Silver → Gold
+</div>
+
+</div>
+</body>
+</html>
