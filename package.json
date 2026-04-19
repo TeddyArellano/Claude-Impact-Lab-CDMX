@@ -4,6 +4,10 @@
   "description": "**Vectores de Dignidad: El derecho a la salud más allá de la puerta**",
   "main": "index.js",
   "scripts": {
+    "dev": "npm --prefix front run dev",
+    "build": "npm --prefix front run build",
+    "preview": "npm --prefix front run preview",
+    "lint": "npm --prefix front run lint",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
