@@ -17,6 +17,16 @@ Propuesta de valor:
 - No es un buzon aislado de quejas.
 - Es una herramienta de gestion urbana basada en datos.
 
+## Contexto del evento
+
+Este proyecto fue desarrollado para el evento **Mexico City | Claude Impact Lab**.
+
+- Referencia oficial del evento: [Luma - Mexico City Claude Impact Lab](https://luma.com/claudemexicocitylab?tk=oELi62)
+- URL del proyecto desplegado: [GeoJusticia en Vercel](https://geojusticia-claude-impact-lab-cdmx.vercel.app/)
+- Video DEMO del proyecto: [GeoJusticia DEMO](https://youtu.be/8pO6592fX8I)
+- Enfoque elegido por el equipo: **Scorecard de Servicios**
+- Objetivo dentro del track: evaluar y visualizar la capacidad de respuesta de servicios urbanos a partir de reportes ciudadanos y analitica territorial.
+
 ## Arquitectura de carpetas
 
 ```text
@@ -195,15 +205,6 @@ Incluye:
 - Navegacion completa de Inicio a Mapas y Denuncias.
 - Visualizacion territorial para apoyo de priorizacion urbana.
 - Registro de denuncias con folio e historial local.
-
-## Contexto del evento
-
-Este proyecto fue desarrollado para el evento **Mexico City | Claude Impact Lab**.
-
-- Referencia oficial del evento: [Luma - Mexico City Claude Impact Lab](https://luma.com/claudemexicocitylab?tk=oELi62)
-- Video DEMO del proyecto: [GeoJusticia DEMO](https://youtu.be/8pO6592fX8I)
-- Enfoque elegido por el equipo: **Scorecard de Servicios**
-- Objetivo dentro del track: evaluar y visualizar la capacidad de respuesta de servicios urbanos a partir de reportes ciudadanos y analitica territorial.
 
 ## Nombre oficial
 
