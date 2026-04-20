@@ -2,6 +2,10 @@
 
 GeoJusticia es una plataforma ciudadana para identificar, priorizar y reportar problemas urbanos en la Ciudad de Mexico mediante contexto territorial.
 
+## Vista de la homepage
+
+![Homepage de GeoJusticia](extra/documents/homepage.png)
+
 ## Idea del proyecto
 
 En CDMX, muchas quejas urbanas no se atienden a tiempo por duplicidad, desorden y falta de priorizacion geografica. GeoJusticia transforma esos reportes en informacion accionable para ciudadania y alcaldias.
