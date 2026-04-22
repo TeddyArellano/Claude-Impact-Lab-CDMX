@@ -213,3 +213,10 @@ Incluye:
 ## Nombre oficial
 
 Nombre oficial del proyecto: GeoJusticia.
+
+## Creditos
+
+- [José Juan Arellano Juárez](https://www.linkedin.com/in/jarellanojr/)
+- [Pablo Uriel Benítez Ramírez](https://www.linkedin.com/in/pablo-uriel-ben%C3%ADtez-ram%C3%ADrez-7b378220a/)
+- [Josué Gómez Torales](https://www.linkedin.com/in/josu%C3%A9-g%C3%B3mez-torales-847361245/)
+- [Diego Pérez Sereno](https://www.linkedin.com/in/diego-p%C3%A9rez-sereno-6838ab3a6/)
