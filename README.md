@@ -103,6 +103,7 @@ Portal de denuncias:
 - Datos reales incorporados en frontend:
   - pasos-seguros-cdmx.csv (base de SAFE_CROSSINGS)
   - ubicacion_c5_c2.csv (base de C5_C2_LOCATIONS)
+- Parte de los datasets reales fueron obtenidos del portal de Datos Abiertos de la CDMX: [datos.cdmx.gob.mx](https://datos.cdmx.gob.mx/).
 
 ### Detalle por fuente y como se usa
 
